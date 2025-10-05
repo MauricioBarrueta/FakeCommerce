@@ -1,0 +1,182 @@
+@if (product$ | async; as product) {  
+  <div class="py-8 bg-gray-900 md:py-16">
+    <div class="max-w-screen-xl px-4 mx-auto 2xl:px-0">
+      <div class="flex flex-col lg:flex-row lg:gap-8 xl:gap-16 items-start">     
+
+        <!-- Columna izquierda -->
+        <div class="flex gap-6 max-w-lg lg:max-w-xl mx-auto flex-1">
+          <div class="flex flex-col gap-3 w-20">
+            @for (thumb of product.images; track $index) {
+              <img [src]="thumb" [alt]="product.title" (click)="onSelectImage(thumb)" [class.border-blue-500]="selectedImg === thumb" class="w-20 h-20 object-cover border rounded-lg cursor-pointer hover:border-blue-500">
+            }
+          </div>
+          <div class="flex-1">
+            <img class="w-full rounded-lg shadow" [src]="selectedImg || product.images[0]" [alt]="product.title">
+            <hr class="my-4 border-gray-200 dark:border-gray-800" />
+            <p class="mb-0 text-center text-gray-500 dark:text-gray-400">{{ product.description }}</p>
+          </div>
+        </div>
+
+        <!-- Columna derecha -->
+        <div class="mt-6 sm:mt-8 lg:mt-0 p-4 rounded-lg bg-red-900">
+          <div class="flex items-center justify-between">
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">{{product.title}}</h1>            
+            <button (click)="addToFavs()" [ngClass]="{'text-red-500': isFav, 'text-gray-400': !isFav}" class="text-xl hover:text-red-600 transition-colors"><i class="fa-solid fa-heart"></i></button>
+          </div>          
+          <div class="mt-4 sm:items-center sm:gap-4 sm:flex">
+            <p class="text-2xl font-extrabold text-gray-900 sm:text-3xl dark:text-white">${{product.price | number:'1.2-2'}}
+              <span class="text-sm font-normal text-gray-400 mr-2">-{{product.discountPercentage}}% OFF</span>
+            </p>
+            <div class="flex items-center justify-end">
+              <div class="flex items-center space-x-1 rtl:space-x-reverse">
+                @for (i of stars; track i) {
+                  <i class="text-lg font-hairline ml-1" [ngClass]="rateIcon(product.rating, i)"></i>
+                }
+              </div>
+              <span class="text-gray-400 text-xs font-semibold px-2.5 py-0.5 ms-3">({{product.rating}})</span>
+              <a (click)="scrollToReviews($event)" class="text-sm font-medium leading-none text-gray-900 underline hover:no-underline dark:text-white">
+                {{ (combinedReviews$ | async)?.length }} Reviews
+              </a>
+            </div>    
+          </div>
+
+          <div class="mt-4 sm:items-center sm:gap-2 sm:flex flex-wrap text-white">
+            <span class="w-full text-base">
+              <i class="fa-solid" [ngClass]="{ 'fa-check-circle text-green-500': product.availabilityStatus === 'In Stock', 'fa-exclamation-triangle text-yellow-400': product.availabilityStatus === 'Low Stock', 'fa-times-circle text-red-500': product.availabilityStatus === 'Out of Stock' }"></i>
+              {{product.availabilityStatus}}
+            </span>
+            <div class="mt-2 space-x-4">
+              <label for="quantity-value">Cantidad: </label>
+              <input type="number" id="quantity-value" [min]="1" [max]="product.stock" [(ngModel)]="quantity" [value]="quantity" class="product-quantity w-16 text-center rounded"><span>{{quantity > 1 ? 'unidades' : 'unidad'}}</span>
+              <span class=" m-0 text-xs text-gray-500">({{ product.stock }} disponibles)</span>
+            </div>          
+          </div>
+
+          <hr class="my-2 md:my-4 border-gray-200 dark:border-gray-800"/>
+          <div class="flex justify-start flex-wrap gap-x-3 text-white my-2 md:my-4">
+            <p class="w-full text-lg text-white font-bold"><i class="fa-solid fa-arrows-up-down-left-right"></i> Dimensiones:</p>
+            <p class="text-lg pt-2">Peso <span class="text-sm">&#xf5cd;&nbsp; {{product.weight}} kg</span></p>
+            <p class="text-lg pt-2">Ancho <span class="text-sm"><i class="fas fa-arrows-left-right"></i>&nbsp; {{product.dimensions.width}} cm</span></p>
+            <p class="text-lg pt-2">Alto <span class="text-sm"><i class="fas fa-arrows-up-down"></i>&nbsp; {{product.dimensions.height}} cm</span></p>
+            <p class="text-lg pt-2">Fondo <span class="text-sm"><i class="fas fa-cube"></i>&nbsp; {{product.dimensions.depth}} cm</span></p>
+          </div>
+
+          <hr class="my-2 md:my-4 border-gray-200 dark:border-gray-800"/>
+          <div class="flex flex-wrap items-center text-white">
+            <p class="text-lg font-bold mr-2"><i class="fa-solid fa-calendar-days"></i> Fecha estimada de llegada:</p>
+            <span class=" text-lg flex items-center">{{ product.shippingInformation }}</span>
+            <span class="text-sm font-normal text-gray-400 ml-2">({{ product.warrantyInformation }})</span>
+          </div>
+
+          <hr class="my-2 md:my-4 border-gray-200 dark:border-gray-800"/>
+          <div class="flex flex-wrap items-center text-white">
+            <p class="text-lg font-bold mr-2"><i class="fas fa-tag"></i> Marca:</p>
+            <span class="p-2 text-lg flex items-center">{{ product.brand }}</span>
+            @for (t of product.tags; track $index) {
+              <span class="text-sm font-normal text-gray-400 ml-2">({{ t }})</span>
+            }
+          </div>
+
+          <hr class="my-2 md:my-4 border-gray-200 dark:border-gray-800"/>
+          <div class="mt-6 sm:gap-4 sm:items-center sm:flex sm:mt-8">
+            <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">&#xf09d;&nbsp; Comprar</button>
+            <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" (click)="navService.onAddToCart(product)">&#xf07a;&nbsp; Agregar al carrito</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div id="reviews-section" class="mt-10 max-w-screen-xl mx-auto px-4">  
+        <button (click)="toggleReviews()" class="flex items-center justify-between w-full bg-gray-100 dark:bg-gray-800 px-4 py-2 focus:outline-none" [ngClass]="showingReviews ? 'rounded-b-none' : 'rounded-lg'">
+          <span class="font-medium text-gray-700 dark:text-gray-300">Opiniones del producto ({{ (combinedReviews$ | async)?.length }})</span>
+          <i class="fa-solid fa-angle-down w-5 h-5 transition-transform" [class.rotate-180]="showingReviews"></i>
+        </button>
+
+        @if (showingReviews) {
+          <div class="bg-green-500 rounded-b-lg">
+
+            <!-- Formulario de opinión -->
+            <div class="p-4 bg-yellow-900 text-gray-600 dark:text-gray-300 text-sm space-y-2" [formGroup]="reviewForm" [ngClass]="showingReviews ? 'rounded-t-none' : 'rounded-lg'">              
+              <div class="flex items-center justify-start mb-2">
+                <label for="message" class="text-sm font-medium text-gray-900 dark:text-white">Opina sobre este producto:</label>
+                <h3 id="message" class="text-sm font-medium text-gray-700 ml-2 dark:text-gray-300">{{user.firstName}} {{user.lastName}}<span>{{ currDate | date:'yyyy-MM-dd' }}</span></h3>
+              </div>
+              <div class="flex items-center space-x-2 w-full">
+                <textarea formControlName="comment" rows="2" placeholder="Escribe tu opinión..." class="block p-2.5 w-full max-w-[78%] text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></textarea>
+                <div class="flex items-center">
+                  @for (s of stars; track s) {
+                    <button type="button" [title]="s + 1" (click)="selectRating(s)" class="text-base p-1 leading-none" [ngClass]="{ 'text-yellow-400': s <= selectedRating, 'text-gray-300': s > selectedRating }">
+                      <i class="fa-solid fa-star cursor-pointer hover:text-[#FFD700]"></i>
+                    </button>
+                  }
+                </div>
+                <button type="button" (click)="submitReview()" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                    Publicar <i class="fa-solid fa-check"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Lista de opiniones existentes -->
+            <div class="space-y-4 mt-4">
+              @for (review of combinedReviews$ | async; track $index) {                    
+                <div class="relative p-4 rounded-lg text-gray-600 dark:text-gray-300 text-sm space-y-2 bg-red-900">
+                  <div class="flex flex-col">
+                    
+    <h3 class="font-medium">{{review.reviewerName}} {{isOwnReview(review) ? '(Tú)' : ''}}</h3>
+    <span class="text-xs text-gray-400">{{review.reviewerEmail}}</span>
+  </div>
+
+  <!-- Fecha en la esquina superior derecha -->
+  <span class="absolute top-4 right-4 text-xs text-gray-400">
+    {{review.date | date:'yyyy-MM-dd'}}
+  </span>
+
+  <!-- Comentario -->
+  <p class="mt-2">{{review.comment}}</p>
+
+  <!-- Estrellas -->
+  <div class="flex items-center space-x-1 rtl:space-x-reverse mt-1">
+    @for (i of stars; track i) {
+      <i class="text-lg font-hairline ml-1" [ngClass]="rateIcon(review.rating, i)"></i>
+    }
+  </div>
+
+  <!-- Botón de eliminar solo si es tu comentario -->
+  @if (isOwnReview(review)) {
+    <button (click)="deleteReview(review)" 
+            class="absolute top-1/2 right-0 transform -translate-y-1/2 text-red-500 hover:text-red-700 text-sm px-2 py-1 rounded">
+      &#xf2ed;
+    </button>
+  }
+</div>
+
+              }
+            </div>           
+          </div>
+        }                     
+      </div>
+    </div>  
+  </div>
+}
+
+<!--! PENDIENTES DE ESTE COMPONENTE
+  * Falta agregar el botón de agregar a favoritos
+-->
+
+
+<!--! RESUMEN DE LO HECHO HASTA LAS 8 AM DEL 05/10/2025-->
+<!--
+  Funcionalidades implementadas:
+    Listado de productos, detalle de producto, filtros por nombre/categoría/tipo.
+    Carrito: agregar, remover, cantidad, total original y con descuento, simulación de compra.
+    Favoritos: agregar/quitar, guardar en localStorage, reflejar estado en botones.
+    Opiniones: agregar comentario y rating con estrellas, mostrar opiniones propias y de otros, eliminar solo las propias, guardar en localStorage.
+    Control de sesión: login, logout, perfil protegido.
+    Mensajes de UI: botón “agregado al carrito”, deshabilitado si ya está en el carrito.
+    LocalStorage usado para persistencia de carrito, favoritos y reviews.
+
+  Pendiente: (ESTO YA DEPENDE DE MI, ESTO FUE LO GENERADO)
+    Perfil: mostrar info del usuario (sin datos bancarios).
+    Wishlist avanzado o historial (opcional).
+    Pulido de UI/UX: estilos, scroll automático en opiniones, botones de “ir al carrito” desde favoritos, etc.
+-->

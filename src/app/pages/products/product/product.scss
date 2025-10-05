@@ -1,0 +1,12 @@
+.img-magnifier-glass {
+  position: absolute;
+  border: 3px solid #000;
+  border-radius: 50%;
+  cursor: none;
+  width: 100px;
+  height: 100px;
+  background-repeat: no-repeat;
+  background-size: 200% 200%; /* zoom 2x */
+  z-index: 1000;
+  pointer-events: none; /* para que no bloquee el mouse */
+}

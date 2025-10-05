@@ -1,0 +1,45 @@
+<section class="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
+  <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+    <h2 class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">Tu lista de favoritos:</h2>
+  
+    <div class="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
+      <div class="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
+        <div class="space-y-6">
+          @for (product of favsList$ | async; track $index) {
+            <div class="rounded-lg border border-gray-200 bg-gray-800 p-4 shadow-sm dark:border-gray-700 ">
+              <div class="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
+                <a class="shrink-0 md:order-1" (click)="getProductDetails(product.id)">
+                  <img class="h-20 w-20" [src]="product.images[0]" [alt]="product.title">
+                </a>
+
+                <div class="flex justify-center items-center md:order-3 py-4">
+                  <div class="ml-6 text-center">
+                    <p class="text-base font-bold text-gray-900 dark:text-white">
+                      ${{ product.price | number:'1.2-2' }} <span class="text-xs font-normal text-gray-400 ml-1">-{{ product.discountPercentage }}%</span>
+                    </p>
+                    <p class="text-xs mt-1">Estado: <span class="ml-1" [ngClass]="product.stock > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">{{ product.stock > 0 ? 'En stock' : 'Agotado' }}</span></p>
+                  </div>
+                </div>
+            
+                <div class="w-full min-w-0 flex-1 space-y-4 md:order-2 md:max-w-md">
+                  <p class="text-lg font-medium text-white mb-2">{{product.title}}</p>
+                  <p class="text-sm text-gray-900 dark:text-white">{{product.description}}</p>
+            
+                  <div class="flex items-center gap-4">
+                    <button [disabled]="isInCart(product.id)" (click)="addToCartFromFav(product)" class="px-3 py-1 rounded text-white" [ngClass]="isInCart(product.id) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'">
+                      {{ isInCart(product.id) ? 'Agregado' : 'Agregar al carrito' }}
+                    </button>
+                    @if (isInCart(product.id)) {
+                      <button [routerLink]="['/cart']" class="px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-white">Ir al carrito</button>
+                    }
+                    <button type="button" (click)="removeFavorite(product)" class="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500">&#xf1f8;&nbsp; Eliminar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

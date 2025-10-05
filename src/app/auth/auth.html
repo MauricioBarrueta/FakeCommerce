@@ -1,0 +1,23 @@
+<div class="w-full h-screen bg-gray-900 flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+  <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 mt-10 sm:mx-auto sm:w-full sm:max-w-sm" (ngSubmit)="logIn()" #loginForm="ngForm">
+    <div class="mb-4">
+      <label class="block text-gray-700 text-base font-bold mb-2" for="username">Nombre de usuario</label>
+      <input [(ngModel)]="username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline placeholder:text-gray-400 placeholder:text-sm" id="username" name="username" type="text" placeholder="Ingrese su nombre de usuario:" autocomplete="off">
+    </div>
+    <div class="mb-4">
+      <label class="block text-gray-700 text-base font-bold mb-2" for="password">Contraseña</label>    
+      <div class="flex items-center border border-red-500 rounded shadow focus-within:shadow-outline">
+        <input [(ngModel)]="password" [type]="showPass ? 'text' : 'password'" class="w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none placeholder:text-gray-400 placeholder:text-sm" id="password" name="password" placeholder="••••••••••••">    
+        <button type="button" (click)="showHidePass()" [attr.aria-pressed]="showPass" aria-label="{{ showPass ? 'Ocultar contraseña' : 'Mostrar contraseña' }}" class="px-3 text-gray-500 cursor-pointer hover:text-gray-700 focus:outline-none"> <i class="fas" [ngClass]="showPass ? 'fa-eye-slash' : 'fa-eye'"></i></button>
+      </div>    
+      <p class="text-red-500 text-xs italic mt-2">{{error}}</p>
+    </div>
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <input type="checkbox" id="rememberMe" name="rememberMe" class="mr-2 cursor-pointer">
+        <label for="rememberMe" class="text-sm text-gray-700 mt-[2px]">Recuérdame</label>
+      </div>      
+      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Iniciar sesión</button>      
+    </div>
+  </form>
+</div>

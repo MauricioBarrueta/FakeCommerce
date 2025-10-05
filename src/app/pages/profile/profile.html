@@ -1,0 +1,45 @@
+@if (user$ | async; as user) {
+    <div class="max-w-3xl mx-auto p-6">
+        <div class="bg-white rounded-2xl shadow-md p-6 flex flex-col gap-4">
+
+            <!-- Header -->
+            <div class="flex items-center gap-4">
+                <img [src]="user.image || 'https://via.placeholder.com/150'" alt="profile pic" class="w-20 h-20 rounded-full border shadow-sm">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">{{user.firstName}} {{user.lastName}}</h2>
+                    <p class="text-gray-500 text-sm">{{user.email}}</p>
+                </div>
+            </div>
+
+            <hr class="my-2">
+            <!-- Información extra -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm text-gray-500">Username</p>
+                    <p class="font-semibold">{{user.username}}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Teléfono</p>
+                    <p class="font-semibold">{{user.phone}}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Dirección</p>
+                    <p class="font-semibold">{{user.address.address}}, {{user.address.city}}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Edad</p>
+                    <p class="font-semibold">{{user.age}} años</p>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="flex justify-end gap-2 mt-4">
+                <button (click)="logOut()" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+}
+
+<!--! PENDIENTES DE ESTE COMPONENTE
+    * Agregar datos bancarios
+-->

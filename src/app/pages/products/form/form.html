@@ -1,0 +1,36 @@
+<div class="w-full bg-white p-4 shadow-sm border border-gray-200">
+  <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">  
+    <div class="flex flex-col">
+      <label for="list-limit" class="text-sm font-medium text-gray-700">Productos por página:</label>
+      <input id="list-limit" type="number" [(ngModel)]="limit" (ngModelChange)="byLimit(limit)" class="mt-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
+    </div>
+  
+    <div class="flex flex-col">
+      <label for="filter-by-type" class="text-sm font-medium text-gray-700">Filtrar por tipo:</label>
+      <input id="filter-by-type" type="text" placeholder="Ej: Phone" [(ngModel)]="type" (ngModelChange)="byType(type)" class="mt-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
+    </div>
+  
+    <div class="flex flex-col">
+      <label for="p-categories" class="text-sm font-medium text-gray-700">Categorías:</label>
+      <div class="relative">
+        <select id="p-categories" class="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none text-gray-700 cursor-pointer">
+          <option selected>Lista de categorías</option>
+            @for (category of categories$ | async; track $index) {
+              <option [value]="category" (click)="byCategory(category.name)">{{ category.name }}</option>
+            }
+        </select>
+        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">&#xf107;</div>
+      </div>
+    </div>
+  
+    <div class="flex flex-col">
+      <label class="text-sm font-medium text-gray-700">Orden:</label>
+      <div class="flex gap-2 mt-1">
+        <button (click)="sortBy()" class="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition cursor-pointer">
+          <i [ngClass]="isSortAsc ? 'fa-solid fa-arrow-up-a-z' : 'fa-solid fa-arrow-down-z-a'"></i>{{isSortAsc ? 'Ascendente' : 'Descendente'}}
+        </button>
+        <button (click)="byLimit(limit)" class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg shadow hover:bg-gray-100 transition cursor-pointer"><i class="fas fa-random"></i>Aleatorio</button>
+      </div>
+    </div>  
+  </div>
+</div>
