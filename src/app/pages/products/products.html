@@ -1,62 +1,62 @@
 <app-form [categories$]="categories$" (filterByCategory)="filterProductsByCategory($event)" (listProducts)="getFeaturedProducts($event)" (filterByType)="filterProductsByType($event)" (sortList)="sortListByTitle()"></app-form>
 
-<div class="w-full flex flex-wrap justify-center">
-    @for (product of products$ | async; track $index) {
-        <div class="w-full max-w-sm relative bg-white border border-gray-200 rounded-lg p-4 shadow-sm dark:bg-gray-800 dark:border-gray-700">
-            <a class="block relative" (click)="navService.getProductDetails(product.id)">
-                <!--! AYER (28) PRESENTABA EL ERROR DE TOKEN AL DAR CLIC PARA VER DETALLES... -->
-                <div class="relative cursor-pointer overflow-visible">
-                    <img class="w-full h-[285px] object-contain hover:scale-105 transition duration-200 linear" src="{{product.thumbnail}}" alt="product image">
-                    <span class="absolute top-[14%] right-0 bg-red-600 text-white text-xs font-bold px-10 py-1 transform rotate-45 translate-x-6 -translate-y-3 shadow-lg" [ngClass]="product.discountPercentage > 0 ? 'visible' : 'invisible'">
-                        -{{ product.discountPercentage }}%
-                    </span>
-                </div>
-
-            </a>
-
-            <h5 class="text-xl font-semibold tracking-tight text-gray-900 dark:text-white">{{product.title}}</h5>
-            <div class="flex items-center justify-end">
-                <div class="flex items-center space-x-1 rtl:space-x-reverse">
-                    @for (i of stars; track i) {
-                        <i class="text-xs font-hairline ml-1" [ngClass]="rateIcon(product.rating, i)"></i>
-                    }
-                </div>
-                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-sm dark:bg-blue-200 dark:text-blue-800 ms-3">{{product.rating}}</span>
-            </div>
-            <div class="flex items-center justify-between flex-wrap">
-                <span class="w-full line-through text-gray-400 mr-2">${{getOriginalPrice(product)}}</span>
-                <span class="text-3xl font-bold text-gray-900 dark:text-white">${{product.price}}</span>
-            </div>                
-                
-            <div class="relative flex items-center justify-between flex-wrap p-2 bg-red-500">
-                <div class="flex">
-                    <button class="w-[25px] h-auto p-0 bg-gray-200 rounded hover:bg-gray-300 text-sm" type="button" (click)="product.quantity = MathRef.max(1, (product.quantity ?? 1) - 1)">-</button>
-                    <input type="number" [min]="1" [max]="product.stock" [(ngModel)]="product.quantity" [value]="product.quantity ?? 1" class="product-quantity w-16 text-center border rounded focus:ring-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                    <button class="w-[25px] h-auto p-0 bg-gray-200 rounded hover:bg-gray-300 text-sm" type="button" (click)="product.quantity = MathRef.min(product.stock, (product.quantity ?? 1) + 1)">+</button>
-                </div> 
-                <div class="flex items-center flex-col">
-                    <span>{{product.availabilityStatus}}</span>
-                    <span class=" m-0 text-xs text-gray-500">({{ product.stock }} disponibles)</span>
-                </div>
-                <div class="flex">
-                    <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" (click)="navService.onAddToCart(product)">&#xf07a;</button>
-                    <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">&#xf09d;</button>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-center flex-col">
-                <p>{{product.shippingInformation}}</p>
-                <p class="text-xs">{{product.warrantyInformation}}</p>
-            </div>
+<div class="w-full flex flex-wrap justify-center p-4 gap-y-4 gap-x-6">
+  @for (product of products$ | async; track product.id) {       
+    <div class="flex flex-wrap w-full max-w-[365px] relative bg-white border border-[var(--gunmetal)] rounded p-4 shadow">
+    
+      <a class="w-full block relative bg-[var(--ghost-white)] rounded border border-[var(--gunmetal)] mb-2" (click)="navService.getProductDetails(product.id)">
+        <div class="relative cursor-pointer rounded">
+          <img class="w-full h-[285px] object-contain scale-95 hover:scale-100 transition duration-200 drop-shadow" [src]="product.thumbnail" [alt]="product.title">
+          @if (product.discountPercentage > 0) {
+            <span class="absolute top-0 right-0 w-0 h-0 border-t-[60px] border-t-[var(--burnt-sienna)] border-l-[60px] border-l-transparent rounded"></span>
+            <span class="absolute top-[8%] right-[4.5%] text-xs font-bold text-white transform rotate-45 translate-x-4 -translate-y-2">
+              -{{ product.discountPercentage | number:'1.2-2' }}%
+            </span>
+          }          
         </div>
-    }
+      </a>
+
+      <h5 class="w-full text-xl font-semibold tracking-tight text-[var(--gunmetal)]">{{ product.title }}</h5>
+      <div class="w-full flex flex-col mt-2 mb-4">
+        <div class="flex items-center justify-between leading-none">
+          <span class="text-lg line-through text-gray-400">${{ getOriginalPrice(product) | number:'1.2-2' }}</span>
+          <div class="flex items-baseline space-x-1 rtl:space-x-reverse">
+            <span class="text-sm text-[var(--gunmetal)] font-medium mr-2">({{ product.rating }})</span>
+            @for (i of stars; track i) {
+              <i class="text-base font-hairline " [ngClass]="rateIcon(product.rating, i)"></i>
+            }
+          </div>
+        </div>
+        <div class="mt-1">
+          <span class="text-3xl font-bold text-[var(--gunmetal)]">${{ product.price | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    
+      <div class="relative flex items-center justify-between flex-wrap p-2 rounded text-[var(--gunmetal)] bg-[var(--light-cyan)] border border-[var(--yinmn-blue)]">
+        <!--! NO FUNCIONAN -->
+        <div class="flex items-center space-x-3">
+          <button (click)="decreaseQuantity(product)" class="w-[26px] h-[38px] px-2 py-1 mr-0 rounded bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] text-white transition duration-200 cursor-pointer rounded-r-none">-</button>
+          <input type="number" [max]="product.stock" [min]="1" [value]="product.quantity ?? 1" id="counter-input" data-input-counter class="w-10 h-[38px] border border-[var(--powder-blue)] bg-white text-center text-sm font-medium focus:outline-none focus:ring-0 no-spinner">
+          <button (click)="increaseQuantity(product)" class="w-[26px] h-[38px] px-2 py-1 rounded bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] text-white transition duration-200 cursor-pointer rounded-l-none">+</button>
+        </div>
+
+        <div class="flex items-center flex-col cursor-default">
+          <span class="flex items-center text-sm font-medium">{{ product.availabilityStatus }} 
+            <i class="fa-solid text-xs ml-1" [ngClass]="{ 'fa-check-circle text-green-500': product.availabilityStatus === 'In Stock', 'fa-exclamation-triangle text-yellow-500': product.availabilityStatus === 'Low Stock', 'fa-times-circle text-red-500': product.availabilityStatus === 'Out of Stock' }"></i>
+          </span>
+          <span class="m-0 mt-1 text-xs text-gray-500">(+{{ product.stock }} {{ product.stock === 1 ? 'disponible' : 'disponibles' }})</span>
+        </div>
+
+        <div class="flex gap-2">
+          <button type="button" class="flex items-center py-2 px-3 text-white text-sm rounded transition cursor-pointer bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)]" (click)="navService.onAddToCart(product)" title="Carrito">&#xf217;</button>
+          <button type="button" class="flex items-center py-2 px-3 text-[var(--gunmetal)] text-sm font-medium rounded transition cursor-pointer border border-[var(--yinmn-blue)] text-[var(--yinmn-blue)] bg-white hover:bg-[var(--yinmn-blue)] hover:text-white" title="Comprar">&#xf09d;</button>
+        </div>
+
+        <div class="w-full flex items-center justify-between text-xs text-gray-500 capitalize mt-2 cursor-default">
+          <p><i class="fa-solid fa-truck-fast text-gray-400 mr-1"></i>{{ getShippingText(product.shippingInformation) }}</p>
+          <p><i class="fa-solid fa-shield-halved text-gray-400 mr-1"></i>{{ product.warrantyInformation }}</p>
+        </div>
+      </div>
+    </div>
+  }
 </div>
-
-<!--
-    Flujo resumido en pasos
-        Visitante:
-            Home(Destacados) → Products → Product detail → (Login requerido para Cart/Profile)
-
-        Usuario logueado:
-            Home(Destacados) → Products → Product detail → Cart → Profile → Logout
--->

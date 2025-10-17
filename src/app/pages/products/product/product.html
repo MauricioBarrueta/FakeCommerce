@@ -1,84 +1,80 @@
 @if (product$ | async; as product) {  
-  <div class="py-8 bg-gray-900 md:py-16">
+  <div class="py-8 md:py-16">
     <div class="max-w-screen-xl px-4 mx-auto 2xl:px-0">
-      <div class="flex flex-col lg:flex-row lg:gap-8 xl:gap-16 items-start">     
-
-        <!-- Columna izquierda -->
+      <div class="flex flex-col lg:flex-row lg:gap-8 xl:gap-16 items-start">   
+        
+        <!-- Images -->
         <div class="flex gap-6 max-w-lg lg:max-w-xl mx-auto flex-1">
           <div class="flex flex-col gap-3 w-20">
             @for (thumb of product.images; track $index) {
-              <img [src]="thumb" [alt]="product.title" (click)="onSelectImage(thumb)" [class.border-blue-500]="selectedImg === thumb" class="w-20 h-20 object-cover border rounded-lg cursor-pointer hover:border-blue-500">
+              <img [src]="thumb" [alt]="product.title" (click)="onSelectImage(thumb)" class="w-20 h-20 object-cover bg-white border rounded cursor-pointer transition-colors duration-200 hover:border-[var(--burnt-sienna)]"
+                [ngClass]="{'border-[var(--burnt-sienna)]': selectedImg === thumb,'border-[var(--gunmetal)]': selectedImg !== thumb}">
             }
           </div>
           <div class="flex-1">
-            <img class="w-full rounded-lg shadow" [src]="selectedImg || product.images[0]" [alt]="product.title">
-            <hr class="my-4 border-gray-200 dark:border-gray-800" />
-            <p class="mb-0 text-center text-gray-500 dark:text-gray-400">{{ product.description }}</p>
+            <img class="w-full rounded bg-white border border-[var(--gunmetal)]" [src]="selectedImg || product.images[0]" [alt]="product.title">
+            <p class="mb-0 mt-6 text-center font-medium text-[var(--gunmetal)]">{{ product.description }}</p>
           </div>
         </div>
 
-        <!-- Columna derecha -->
-        <div class="mt-6 sm:mt-8 lg:mt-0 p-4 rounded-lg bg-red-900">
+        <!-- Info -->
+        <div class="w-full max-w-[665px] mt-6 sm:mt-8 lg:mt-0 p-4 rounded bg-white text-[var(--gunmetal)] border border-[var(--gunmetal)]">
           <div class="flex items-center justify-between">
-            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">{{product.title}}</h1>            
-            <button (click)="addToFavs()" [ngClass]="{'text-red-500': isFav, 'text-gray-400': !isFav}" class="text-xl hover:text-red-600 transition-colors"><i class="fa-solid fa-heart"></i></button>
-          </div>          
-          <div class="mt-4 sm:items-center sm:gap-4 sm:flex">
-            <p class="text-2xl font-extrabold text-gray-900 sm:text-3xl dark:text-white">${{product.price | number:'1.2-2'}}
-              <span class="text-sm font-normal text-gray-400 mr-2">-{{product.discountPercentage}}% OFF</span>
+            <h1 class="text-xl font-semibold text-[var(--gunmetal)] sm:text-2xl flex items-baseline gap-2">
+              {{product.title}}
+              <span class="text-xs text-gray-500 font-normal">({{ product.brand }})</span>
+            </h1>   
+            <button (click)="addToFavs()" [ngClass]="{'text-red-500': isFav, 'text-gray-400': !isFav}" class="text-xl hover:text-red-600 transition-colors cursor-pointer">
+              <i class="fa-solid fa-heart"></i>
+            </button>  
+          </div>
+
+          <div class="sm:items-center sm:gap-4 sm:flex justify-between mt-6 md:mt-8">
+            <p class="text-2xl font-extrabold text-[var(--gunmetal)] sm:text-3xl">${{product.price | number:'1.2-2'}}
+              <span class="text-sm font-normal text-[var(--burnt-sienna)] mr-2">-{{product.discountPercentage}}% OFF</span>
             </p>
+
             <div class="flex items-center justify-end">
+              <span class="text-gray-400 text-sm font-semibold mr-2 cursor-default">({{product.rating}})</span>
               <div class="flex items-center space-x-1 rtl:space-x-reverse">
                 @for (i of stars; track i) {
                   <i class="text-lg font-hairline ml-1" [ngClass]="rateIcon(product.rating, i)"></i>
                 }
               </div>
-              <span class="text-gray-400 text-xs font-semibold px-2.5 py-0.5 ms-3">({{product.rating}})</span>
-              <a (click)="scrollToReviews($event)" class="text-sm font-medium leading-none text-gray-900 underline hover:no-underline dark:text-white">
-                {{ (combinedReviews$ | async)?.length }} Reviews
+              <a (click)="scrollToReviews($event)" class="text-sm font-medium leading-none text-gray-400 underline ml-2 hover:no-underline cursor-pointer">
+                {{ reviewsService.totalReviews$ | async }} Reviews
               </a>
             </div>    
           </div>
 
-          <div class="mt-4 sm:items-center sm:gap-2 sm:flex flex-wrap text-white">
-            <span class="w-full text-base">
-              <i class="fa-solid" [ngClass]="{ 'fa-check-circle text-green-500': product.availabilityStatus === 'In Stock', 'fa-exclamation-triangle text-yellow-400': product.availabilityStatus === 'Low Stock', 'fa-times-circle text-red-500': product.availabilityStatus === 'Out of Stock' }"></i>
-              {{product.availabilityStatus}}
+          <div class="mt-4 sm:items-center sm:gap-2 sm:flex flex-wrap">
+            <span class="w-full text-xl">{{product.availabilityStatus}}
+              <i class="fa-solid ml-1" [ngClass]="{ 'fa-check-circle text-green-500': product.availabilityStatus === 'In Stock', 'fa-exclamation-triangle text-yellow-400': product.availabilityStatus === 'Low Stock', 'fa-times-circle text-red-500': product.availabilityStatus === 'Out of Stock' }"></i>
             </span>
-            <div class="mt-2 space-x-4">
-              <label for="quantity-value">Cantidad: </label>
-              <input type="number" id="quantity-value" [min]="1" [max]="product.stock" [(ngModel)]="quantity" [value]="quantity" class="product-quantity w-16 text-center rounded"><span>{{quantity > 1 ? 'unidades' : 'unidad'}}</span>
-              <span class=" m-0 text-xs text-gray-500">({{ product.stock }} disponibles)</span>
+            <div class="flex items-center mt-2 space-x-4">
+              <label class="text-xl font-bold mr-2" for="quantity-value">Cantidad:</label>
+              <input type="number" id="quantity-value" [min]="1" [max]="product.stock" [(ngModel)]="quantity" [value]="quantity" class="p-2 mr-0 border border-0 rounded text-black font-bold text-sm text-center focus:ring-1 focus:ring-[var(--yinmn-blue)] focus:border-[var(--yinmn-blue)]">
+              <span class="text-lg ml-2">{{quantity > 1 ? 'unidades' : 'unidad'}}</span>
+              <span class=" m-0 text-xs text-gray-500">(+{{ product.stock }} disponibles)</span>
             </div>          
           </div>
 
-          <hr class="my-2 md:my-4 border-gray-200 dark:border-gray-800"/>
-          <div class="flex justify-start flex-wrap gap-x-3 text-white my-2 md:my-4">
-            <p class="w-full text-lg text-white font-bold"><i class="fa-solid fa-arrows-up-down-left-right"></i> Dimensiones:</p>
-            <p class="text-lg pt-2">Peso <span class="text-sm">&#xf5cd;&nbsp; {{product.weight}} kg</span></p>
-            <p class="text-lg pt-2">Ancho <span class="text-sm"><i class="fas fa-arrows-left-right"></i>&nbsp; {{product.dimensions.width}} cm</span></p>
-            <p class="text-lg pt-2">Alto <span class="text-sm"><i class="fas fa-arrows-up-down"></i>&nbsp; {{product.dimensions.height}} cm</span></p>
-            <p class="text-lg pt-2">Fondo <span class="text-sm"><i class="fas fa-cube"></i>&nbsp; {{product.dimensions.depth}} cm</span></p>
+          <div class="flex justify-start items-center flex-wrap gap-x-6 space-y-3 my-6 md:my-7">
+            <p class="w-full text-xl font-bold">Dimensiones:</p>
+            <p class="text-base text-[var(--gunmetal)] mb-0" title="Peso"><i class="fa-solid fa-weight-scale text-gray-400"></i>&nbsp; {{product.weight}} kg</p>
+            <p class="text-base text-[var(--gunmetal)] mb-0" title="Ancho"><i class="fas fa-arrows-left-right text-gray-400"></i>&nbsp; {{product.dimensions.width}} cm</p>
+            <p class="text-base text-[var(--gunmetal)] mb-0" title="Alto"><i class="fas fa-arrows-up-down text-gray-400"></i>&nbsp; {{product.dimensions.height}} cm</p>
+            <p class="text-base text-[var(--gunmetal)] mb-0" title="Profundidad"><i class="fas fa-cube text-gray-400"></i>&nbsp; {{product.dimensions.depth}} cm</p>
           </div>
 
-          <hr class="my-2 md:my-4 border-gray-200 dark:border-gray-800"/>
-          <div class="flex flex-wrap items-center text-white">
-            <p class="text-lg font-bold mr-2"><i class="fa-solid fa-calendar-days"></i> Fecha estimada de llegada:</p>
-            <span class=" text-lg flex items-center">{{ product.shippingInformation }}</span>
-            <span class="text-sm font-normal text-gray-400 ml-2">({{ product.warrantyInformation }})</span>
+          <div class="flex flex-wrap items-center gap-x-6 space-y-3 my-6 md:my-7">
+            <p class="w-full text-xl font-bold">Fecha estimada de llegada:</p>
+            <span class="text-base text-black mb-0"><i class="fa-solid fa-truck-fast text-gray-400"></i>&nbsp; {{ getShippingText(product.shippingInformation) }}</span>
+            <span class="text-xs text-gray-500 mb-0 ml-1" title="Garantía"><i class="fa-solid fa-shield-halved text-base text-gray-400"></i>&nbsp; ({{ product.warrantyInformation }})</span>
           </div>
 
-          <hr class="my-2 md:my-4 border-gray-200 dark:border-gray-800"/>
-          <div class="flex flex-wrap items-center text-white">
-            <p class="text-lg font-bold mr-2"><i class="fas fa-tag"></i> Marca:</p>
-            <span class="p-2 text-lg flex items-center">{{ product.brand }}</span>
-            @for (t of product.tags; track $index) {
-              <span class="text-sm font-normal text-gray-400 ml-2">({{ t }})</span>
-            }
-          </div>
-
-          <hr class="my-2 md:my-4 border-gray-200 dark:border-gray-800"/>
-          <div class="mt-6 sm:gap-4 sm:items-center sm:flex sm:mt-8">
+          <!--! FALTA ESTO -->
+          <div class="sm:gap-4 sm:items-center sm:flex mt-6 sm:mt-8">
             <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">&#xf09d;&nbsp; Comprar</button>
             <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" (click)="navService.onAddToCart(product)">&#xf07a;&nbsp; Agregar al carrito</button>
           </div>
@@ -86,70 +82,58 @@
       </div>
 
       <!-- Reviews -->
-      <div id="reviews-section" class="mt-10 max-w-screen-xl mx-auto px-4">  
-        <button (click)="toggleReviews()" class="flex items-center justify-between w-full bg-gray-100 dark:bg-gray-800 px-4 py-2 focus:outline-none" [ngClass]="showingReviews ? 'rounded-b-none' : 'rounded-lg'">
-          <span class="font-medium text-gray-700 dark:text-gray-300">Opiniones del producto ({{ (combinedReviews$ | async)?.length }})</span>
-          <i class="fa-solid fa-angle-down w-5 h-5 transition-transform" [class.rotate-180]="showingReviews"></i>
+      <div id="reviews-section" class="w-full mt-8">  
+        <button (click)="toggleReviews()" class="flex items-center justify-between w-full p-4 bg-white text-[var(--gunmetal)] border border-[var(--gunmetal)] rounded focus:outline-none cursor-pointer" [ngClass]="showingReviews ? 'rounded-b-none border-b-0' : 'rounded border-b'">
+          <span class="text-lg font-bold">Opiniones de este producto ({{ reviewsService.totalReviews$ | async }})</span>
+          <i class="fa-solid fa-angle-down w-4 h-4 transition-transform" [class.rotate-180]="showingReviews"></i>
         </button>
 
         @if (showingReviews) {
-          <div class="bg-green-500 rounded-b-lg">
-
-            <!-- Formulario de opinión -->
-            <div class="p-4 bg-yellow-900 text-gray-600 dark:text-gray-300 text-sm space-y-2" [formGroup]="reviewForm" [ngClass]="showingReviews ? 'rounded-t-none' : 'rounded-lg'">              
-              <div class="flex items-center justify-start mb-2">
-                <label for="message" class="text-sm font-medium text-gray-900 dark:text-white">Opina sobre este producto:</label>
-                <h3 id="message" class="text-sm font-medium text-gray-700 ml-2 dark:text-gray-300">{{user.firstName}} {{user.lastName}}<span>{{ currDate | date:'yyyy-MM-dd' }}</span></h3>
-              </div>
-              <div class="flex items-center space-x-2 w-full">
-                <textarea formControlName="comment" rows="2" placeholder="Escribe tu opinión..." class="block p-2.5 w-full max-w-[78%] text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></textarea>
-                <div class="flex items-center">
-                  @for (s of stars; track s) {
-                    <button type="button" [title]="s + 1" (click)="selectRating(s)" class="text-base p-1 leading-none" [ngClass]="{ 'text-yellow-400': s <= selectedRating, 'text-gray-300': s > selectedRating }">
-                      <i class="fa-solid fa-star cursor-pointer hover:text-[#FFD700]"></i>
-                    </button>
-                  }
+          <div class="px-4 pb-4 pt-0 bg-white rounded-b border border[var(--gunmetal)] border-t-0">
+            <!-- Form -->
+            <div class="p-4 bg-[var(--light-cyan)] text-[var(--gunmetal)] rounded border border-[var(--yinmn-blue)]" [formGroup]="reviewForm"> 
+              <label for="message" class="text-base font-medium">Escribe tu opinión:</label>
+              <div class="w-full flex items-center justify-between flex-wrap mt-2">
+                <textarea formControlName="comment" rows="2" placeholder="¿Qué opinas de este producto?" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
+                  class="w-full max-w-[75%] block p-2 text-sm placeholder:text-gray-400 bg-white rounded border border-[var(--gunmetal)] focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </textarea>
+                
+                <div class="flex items-center space-x-3 ml-2">
+                  <div class="flex items-center space-x-2 mx-4">
+                    @for (s of stars; track s) {
+                      <button type="button" [title]="s + 1" (click)="selectRating(s)" class="text-lg transition duration-200" [ngClass]="{ 'text-yellow-500': s <= selectedRating, 'text-gray-400': s > selectedRating }">
+                        <i class="fa-solid fa-star cursor-pointer hover:text-yellow-500"></i>
+                      </button>
+                    }
+                  </div>
+                  <button type="button" (click)="submitReview()" aria-label="Publicar" class="bg-[var(--yinmn-blue)] text-white text-sm py-2 px-4 rounded hover:bg-[var(--yinmn-blue-shadow)] transition duration-100 cursor-pointer"><i class="fa-solid fa-comment-dots"></i></button>
                 </div>
-                <button type="button" (click)="submitReview()" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
-                    Publicar <i class="fa-solid fa-check"></i>
-                </button>
               </div>
             </div>
 
-            <!-- Lista de opiniones existentes -->
+            <!-- Cards -->
             <div class="space-y-4 mt-4">
-              @for (review of combinedReviews$ | async; track $index) {                    
-                <div class="relative p-4 rounded-lg text-gray-600 dark:text-gray-300 text-sm space-y-2 bg-red-900">
+               @for (review of reviewsService.reviews$ | async; track $index) {
+                <div class="relative p-4 bg-[var(--ghost-white)] text-[var(--gunmetal)] border border-[var(--powder-blue)] rounded space-y-2">
                   <div class="flex flex-col">
-                    
-    <h3 class="font-medium">{{review.reviewerName}} {{isOwnReview(review) ? '(Tú)' : ''}}</h3>
-    <span class="text-xs text-gray-400">{{review.reviewerEmail}}</span>
-  </div>
+                    <h3 class="font-medium"><i class="fa-solid fa-user text-gray-400"></i>&nbsp; {{ review.reviewerName }} 
+                      <span class="text-xs text-gray-500 ml-1">{{ isOwnReview(review) ? '(Tú)' : '' }}</span>
+                    </h3>
+                    <span class="text-xs text-gray-400 mt-1">{{ review.reviewerEmail }}</span>
+                  </div>                  
+                  <span class="absolute top-4 right-4 text-sm text-gray-400">{{ review.date | date:'yyyy-MM-dd' }}</span>
 
-  <!-- Fecha en la esquina superior derecha -->
-  <span class="absolute top-4 right-4 text-xs text-gray-400">
-    {{review.date | date:'yyyy-MM-dd'}}
-  </span>
-
-  <!-- Comentario -->
-  <p class="mt-2">{{review.comment}}</p>
-
-  <!-- Estrellas -->
-  <div class="flex items-center space-x-1 rtl:space-x-reverse mt-1">
-    @for (i of stars; track i) {
-      <i class="text-lg font-hairline ml-1" [ngClass]="rateIcon(review.rating, i)"></i>
-    }
-  </div>
-
-  <!-- Botón de eliminar solo si es tu comentario -->
-  @if (isOwnReview(review)) {
-    <button (click)="deleteReview(review)" 
-            class="absolute top-1/2 right-0 transform -translate-y-1/2 text-red-500 hover:text-red-700 text-sm px-2 py-1 rounded">
-      &#xf2ed;
-    </button>
-  }
-</div>
-
+                  <div class="flex items-center space-x-1 rtl:space-x-reverse my-4">
+                    @for (i of stars; track i) {
+                      <i class="text-sm font-hairline" [ngClass]="rateIcon(review.rating, i)"></i>
+                    }
+                    <span class="text-gray-400 text-xs ml-1 cursor-default">({{product.rating}})</span>
+                  </div>
+                  <p class="text-[var(--gunmetal)]"><i class="fa-solid fa-comment-dots text-gray-400 text-sm"></i>&nbsp; {{ review.comment }}</p> 
+                  @if (isOwnReview(review)) {
+                    <button (click)="deleteReview(review)" class="absolute bottom-2 right-2 text-red-500 hover:text-red-600 text-xs transition duration-200 cursor-pointer">&#xf2ed;</button>
+                  }
+                </div>                
               }
             </div>           
           </div>
@@ -159,8 +143,10 @@
   </div>
 }
 
-<!--! PENDIENTES DE ESTE COMPONENTE
-  * Falta agregar el botón de agregar a favoritos
+<!--! PENDIENTES DE ESTE COMPONENTE-->
+<!--
+  * Que agregue al carrito la cantidad que se eliga, porque ahorita aunque se ponga x cantidad solamente agrega '1' en el carrito
+  * Que al intentar escribir una opinión sin haber iniciado sesión avise que debe iniciar sesión, o que esté deshabilitado el form, o algo así aún no estoy seguro
 -->
 
 

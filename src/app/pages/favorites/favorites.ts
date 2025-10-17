@@ -33,16 +33,6 @@ export class Favorites implements OnInit {
     this.navService.getProductDetails(id)
   }
 
-
-
-  // message = ''; // ← almacena el texto del mensaje
-  // showMsg = false; // ← controla la visibilidad
-
-  //! este es el bueno
-  // addToCart(product: ProductsData) {
-  //   this.favsService.addToCartFromFavorites(product)
-  // }
-
   isInCart(productId: number): boolean {
     return this.cartService.isInCart(productId)
   }

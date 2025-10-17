@@ -2,3 +2,75 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif, FontAwesome; }
+
+:root {
+    --yinmn-blue: #3d5a80; --yinmn-blue-shadow: #5d79a1;
+    --powder-blue: #98c1d9; --powder-blue-shadow: #6f98af;
+    --light-cyan: #e0fbfc; --light-cyan-shadow: #aac4c5;
+    --burnt-sienna: #ee6c4d; --burnt-sienna-shadow: #c84b30;
+    --gunmetal: #293241; --gunmetal-shadow: #4d5667;
+    --ghost-white: #F8FAFC;
+}
+
+/* Ocultar botones del input:number */
+.no-spinner {
+   appearance: none; -webkit-appearance: none;
+   margin: 0;
+}
+.no-spinner::-webkit-outer-spin-button, .no-spinner::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.no-spinner[type=number] { appearance: none; -moz-appearance: textfield; }
+
+/* Borde linear Estrellas */
+.star-outline {
+  -webkit-text-stroke: 1px var(--gunmetal); /* borde negro */
+  -webkit-text-fill-color: #f59e0b; /* amarillo */
+}
+
+/* Activar animación solamente 1 vez*/
+.anim-count-1 {
+   animation-iteration-count: 1;
+}
+
+
+/* ============================================
+   PALETA DE COLORES – "Urban Depth" (E-commerce)
+   ============================================
+
+   Primario: #3D5A80 (Azul oscuro)
+      - Uso: Botones principales (“Agregar al carrito”, “Comprar ahora”), links destacados, íconos importantes.
+      - Contrasta muy bien con fondos claros y llama la atención del usuario sobre acciones importantes.
+
+   Secundario: #98C1D9 (Azul suave)
+      - Uso: Botones secundarios, hover en botones primarios, tarjetas de productos, backgrounds de secciones menos importantes.
+      - Ayuda a jerarquizar elementos sin competir con el primario.
+
+   Acento: #EE6C4D (Naranja quemado)
+      - Uso: Badges de descuento, alertas, toasts de éxito/error, indicadores de cantidad o promociones.
+      - Sirve para resaltar información importante o estados.
+
+   Fondo: #E0FBFC (Azul muy claro)
+      - Uso: Fondo general de la página, secciones, tarjetas de producto.
+      - Mantiene la interfaz limpia y amplia.
+
+   Texto principal: #293241 (Gris oscuro / azul profundo)
+      - Uso: Titulares, nombres de productos, precios, información importante.
+      - Máxima legibilidad sobre fondos claros.
+
+   Texto secundario: #6B7280 (Gris medio / azul suave)
+      - Uso: Descripciones, subtítulos, placeholders, textos menos importantes.
+      - Permite jerarquía visual sin restar importancia al contenido principal.
+
+   RECOMENDACIONES DE USO
+   - Botones / CTA:
+     - Primario → acciones clave
+     - Secundario → acciones menos importantes
+   - Alertas / mensajes:
+     - Acento → destacar toasts, promociones, errores leves
+   - Fondo / tarjetas:
+     - Fondo → mayor parte de la interfaz
+     - Secundario → bordes o sombras de tarjetas
+   - Textos:
+     - Texto principal → info crítica
+     - Texto secundario → info complementaria o placeholders
+   - Consistencia: Mantener esta asignación para no confundir al usuario
+============================================ */

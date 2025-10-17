@@ -1,40 +1,43 @@
-<header class="bg-gray-900 text-white px-6 py-4 flex justify-between items-center">
-  <!-- Logo -->
+<header class="bg-[var(--gunmetal)] text-white px-6 py-4 flex justify-between items-center">
+  <!--! LOGO (ESTE SE CAMBIA) -->
   <div class="flex items-center space-x-2">
     <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-      <span class="text-white font-bold">T</span>
+      <span class="text-white font-bold">FK</span>
     </div>
-    <span class="font-bold text-lg">DummyJSON</span>
+    <span class="font-bold text-lg">FakeCommerce.com</span>
   </div>
 
-  <!-- Navegación -->
-  <nav class="flex items-center space-x-6">
-    <a [routerLink]="['/products']" class="hover:text-gray-300">Inicio</a>
-    <a [routerLink]="['/cart']" class="relative hover:text-gray-300">&#xf07a; Carrito
-      @if (cartCount > 0) {
-        <span class="absolute -top-2 -right-3 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">{{ cartDisplay }}</span>
-      }
-    </a>
-    <a href="#" class="hover:text-gray-300">Mis compras</a>
-    <a [routerLink]="['/favorites']" class="relative hover:text-gray-300">&#xf004; Favoritos
-      @if (favsCount > 0) {
-        <span class="absolute -top-2 -right-3 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">{{ favsDisplay }}</span>
-      }
-    </a>
-  </nav>
+  <div class="flex items-center justify-end space-x-10">
+    <nav class="flex items-center space-x-2">
+      <a class="mr-2 bg-[var(--yinmn-blue)] px-4 py-2 rounded" [routerLink]="['/products']">&#xf54e;&nbsp; Productos</a>
+      <a class="relative mr-2 bg-[var(--yinmn-blue)] px-4 py-2 rounded" [routerLink]="['/cart']">&#xf07a;&nbsp; Carrito
+        @if (cartCounter > 0) {
+          <span class="w-5 h-5 flex items-center justify-center absolute -top-2 -right-1 bg-[var(--burnt-sienna)] text-white text-xs rounded">{{ cartDisplay }}</span>
+        }
+      </a>
+      <a class="mr-2 bg-[var(--yinmn-blue)] px-4 py-2 rounded" [routerLink]="['/purchases']">&#xf290;&nbsp; Mis compras</a>
+      <a class="relative bg-[var(--yinmn-blue)] px-4 py-2 rounded" [routerLink]="['/favorites']">&#xf004;&nbsp; Favoritos
+        @if (favsCounter > 0) {
+          <span class="w-5 h-5 flex items-center justify-center absolute -top-2 -right-1 bg-[var(--burnt-sienna)] text-white text-xs rounded">{{ favsDisplay }}</span>
+        }
+      </a>
+    </nav>
 
-  <!-- Acciones de sesión -->
-  <div class="flex items-center space-x-4">
-    @if (user) {
-      <div class="flex flex-col items-center justify-center">
-        <span class="font-medium">{{ user.firstName }}</span>
-        <a (click)="navService.getProfileDetails(user.id)" class="text-xs cursor-pointer">Mi perfil &#xf105;</a>
-      </div>      
-      <button (click)="logOut()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg">Salir &#xf2f5;</button>
-    } @else {
-      <button [routerLink]="['/login']" class="hover:text-gray-300">Iniciar sesión &#xf2f6;</button>
-    }
-  </div>
+    <div class="flex items-center space-x-4">
+      @if (user) {
+        <div class="flex flex-col items-center justify-center">
+          <span class="text-sm font-bold cursor-default"><i class="fa-solid fa-user"></i> {{ user.firstName }} {{ user.lastName }}</span>
+          <a (click)="navService.getProfileDetails(user.id)" class="text-xs cursor-pointer">Mi perfil &nbsp;&#xf105;</a>
+        </div>
+        <button (click)="logOut()" class="bg-[var(--burnt-sienna)] hover:bg-[var(--burnt-sienna-shadow)] text-sm p-2 rounded cursor-pointer transition duration-100">Salir &nbsp;&#xf2f5;</button>
+      } @else {
+        <div class="flex flex-col items-center justify-center">
+          <span class="text-sm font-bold cursor-default"><i class="fa-solid fa-user-slash"></i> Inicia sesión</span>
+        </div>
+        <button [routerLink]="['/login']" class="bg-[var(--light-cyan)] hover:bg-[#aac4c5] text-[var(--gunmetal)] text-sm p-2 rounded cursor-pointer transition duration-100">Entrar &nbsp;&#xf2f6;</button>
+      }
+    </div>
+  </div>  
 </header>
 
 

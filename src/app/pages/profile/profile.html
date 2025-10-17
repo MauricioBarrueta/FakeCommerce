@@ -1,45 +1,87 @@
-@if (user$ | async; as user) {
-    <div class="max-w-3xl mx-auto p-6">
-        <div class="bg-white rounded-2xl shadow-md p-6 flex flex-col gap-4">
+<section class="py-8 md:py-16">
+  <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+    <h2 class="text-2xl font-semibold text-[var(--gunmetal)]">Tu perfil de usuario:</h2>
 
-            <!-- Header -->
-            <div class="flex items-center gap-4">
-                <img [src]="user.image || 'https://via.placeholder.com/150'" alt="profile pic" class="w-20 h-20 rounded-full border shadow-sm">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">{{user.firstName}} {{user.lastName}}</h2>
-                    <p class="text-gray-500 text-sm">{{user.email}}</p>
-                </div>
-            </div>
+      @if (user$ | async; as user) {
+        <div class="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
+          <div class="w-full flex-none">
+            <div class="space-y-6">
+              <div class="w-full max-w-3xl mx-auto rounded border border-[var(--gunmetal)] bg-white text-[var(--gunmetal)] p-4">
+                
+                <div class="flex items-center gap-4 py-2 px-4 rounded border border-[var(--powder-blue)] bg-[var(--ghost-white)]">
+                  <img [src]="user.image || 'https://tinyurl.com/2yspct3q'" alt="Foto de perfil" class="w-24 h-24 rounded-full bg-white border border-[var(--gunmetal)] p-2">
+                  
+                  <div class="p-4">
+                    <h2 class="text-2xl font-bold text-[var(--gunmetal)]">{{ user.firstName }} {{ user.lastName }}</h2>
+                    <div class="flex items-center gap-2 mt-2 text-gray-500 text-sm">
+                      <i class="fa-solid fa-user text-gray-400"></i><span>{{ user.username }}</span>
+                      <i class="fa-solid fa-phone text-gray-400 ml-2"></i><span>{{ maskPhone(user.phone) }}</span>
+                    </div>
 
-            <hr class="my-2">
-            <!-- Información extra -->
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <p class="text-sm text-gray-500">Username</p>
-                    <p class="font-semibold">{{user.username}}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-500">Teléfono</p>
-                    <p class="font-semibold">{{user.phone}}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-500">Dirección</p>
-                    <p class="font-semibold">{{user.address.address}}, {{user.address.city}}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-500">Edad</p>
-                    <p class="font-semibold">{{user.age}} años</p>
-                </div>
-            </div>
+                    <div class="flex items-center gap-2 text-gray-500 text-sm mt-2">
+                      <i class="fa-solid fa-at text-gray-400"></i><span>{{ user.email }}</span>
+                    </div>
 
-            <!-- Acciones -->
-            <div class="flex justify-end gap-2 mt-4">
-                <button (click)="logOut()" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg">Cerrar sesión</button>
+                    <div class="flex items-center gap-2 text-gray-500 text-sm mt-2">
+                      <i class="fa-solid fa-cake-candles text-gray-400"></i><span>{{ user.birthDate | date:'yyyy-MM-dd' }}&nbsp; ({{ user.age }} años)</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="flex flex-col py-4">
+                  <p class="text-lg font-bold mb-1">Dirección registrada para entrega:</p>
+                  <p class="text-sm text-gray-500 flex flex-wrap items-center">
+                    <i class="fa-solid fa-location-dot text-gray-400 mr-1"></i>
+                    <span class="truncate md:whitespace-normal text-base">{{ user.address.address }}, {{ user.address.city }}, {{ user.address.state }} {{ user.address.postalCode }}, {{ user.address.country }}</span>
+                  </p>
+                </div>            
+
+                <div class="flex">
+                  <button (click)="toggleBankData()" class="w-full flex items-center justify-between w-auto px-4 py-2 bg-[var(--ghost-white)] text-[var(--gunmetal)] border border-[var(--powder-blue)] rounded focus:outline-none cursor-pointer" [ngClass]="showingBankData ? 'rounded-b-none border-b-0' : 'rounded border-b'">
+                    <span class="text-lg font-bold">{{ showingBankData ? 'Ocultar datos bancarios' : 'Mostrar datos bancarios' }}</span>
+                    <i class="fa-solid fa-angle-down w-4 h-4 ml-2 transition-transform" [class.rotate-180]="showingBankData"></i>
+                  </button>
+                </div>
+                @if(showingBankData) {
+                  @if (user.bank) {
+                    <div class="p-4 bg-white rounded-b border border-[var(--powder-blue)] border-t-[var(--powder-blue)]">
+                      <div class="grid grid-cols-2 gap-4 cursor-default">
+                        <div class="space-y-2">
+                          <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-credit-card text-gray-400" title="N.° de tarjeta"></i>
+                            <p class="mb-0">{{ maskCard(user.bank.cardNumber) }}</p>
+                          </div>
+                          <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-id-card text-gray-400" title="Tipo de tarjeta"></i>
+                            <p class="mb-0">{{ user.bank.cardType }}</p>
+                          </div>
+                        </div>
+
+                        <div class="space-y-2">
+                          <div class="flex items-center gap-2">
+                            <i class="fa-regular fa-calendar text-gray-400" title="Fecha de expiración"></i>
+                            <p class="mb-0">{{ user.bank.cardExpire }}</p>
+                          </div>
+                          <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-dollar-sign text-gray-400" title="Tipo de moneda"></i>
+                            <p class="mb-0">{{ user.bank.currency }}</p>
+                          </div>      
+                        </div>
+                      </div>
+                    </div>
+                  }
+                }        
+              </div>
             </div>
+          </div>
         </div>
-    </div>
-}
+      }
+  </div>
+</section>  
+
+
 
 <!--! PENDIENTES DE ESTE COMPONENTE
     * Agregar datos bancarios
 -->
+

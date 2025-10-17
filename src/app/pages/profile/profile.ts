@@ -16,6 +16,7 @@ export class Profile implements OnInit {
 
   id: number = 0
   user$!: Observable<ProfileInterface>
+  showingBankData: boolean = false
 
   constructor(private route: ActivatedRoute, private router: Router, private profileService: ProfileService, private authService: AuthService) {}
 
@@ -24,14 +25,41 @@ export class Profile implements OnInit {
     this.user$ = this.route.queryParams
       .pipe(
         map(params => + params['id']),
-        switchMap(id => this.profileService.getFeaturedProducts(id))
+        switchMap(id => this.profileService.getLoggedUserInfo(id))
       )
   }
 
-  logOut() {
-    this.authService.logOut()
-    this.router.navigate(['/products'])
+  // logOut() {
+  //   this.authService.logOut()
+  //   this.router.navigate(['/products'])
+  // }
+
+
+  maskPhone(phone: string): string {
+  if (!phone) return '';
+
+  // Elimina espacios
+  const clean = phone.replace(/\s+/g, '');
+  // Toma los primeros 3 y los últimos 3 caracteres visibles
+  const first = clean.slice(0, 3);
+  const last = clean.slice(-3);
+
+  return `${first} ***-*** ${last}`;
+}
+
+  maskCard(num: string): string {
+    if(!num) return ''
+      const clean = num.replace(/\s+/g, '')
+      const last = clean.slice(-4)
+
+      return `**** **** **** ${last}`
   }
+
+  toggleBankData() {
+    this.showingBankData = !this.showingBankData;
+  } 
+
+  
 
 
 }

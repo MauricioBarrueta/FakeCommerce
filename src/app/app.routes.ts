@@ -6,6 +6,7 @@ import { Cart } from './pages/cart/cart';
 import { authGuard } from './auth/guards/auth-guard';
 import { Profile } from './pages/profile/profile';
 import { Favorites } from './pages/favorites/favorites';
+import { Purchases } from './pages/purchases/purchases';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'products', pathMatch: 'full' },
@@ -14,6 +15,7 @@ export const routes: Routes = [
     { path: 'login', component: Auth },
     { path: 'cart', component: Cart, canActivate: [authGuard] },
     { path: 'favorites', component: Favorites, canActivate: [authGuard] },
+    { path: 'purchases', component: Purchases, canActivate: [authGuard] },
     { path: 'profile', component: Profile, canActivate: [authGuard] },
     { path: '**', redirectTo: 'products' },  
 ];

@@ -1,23 +1,47 @@
-<div class="w-full h-screen bg-gray-900 flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-  <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 mt-10 sm:mx-auto sm:w-full sm:max-w-sm" (ngSubmit)="logIn()" #loginForm="ngForm">
-    <div class="mb-4">
-      <label class="block text-gray-700 text-base font-bold mb-2" for="username">Nombre de usuario</label>
-      <input [(ngModel)]="username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline placeholder:text-gray-400 placeholder:text-sm" id="username" name="username" type="text" placeholder="Ingrese su nombre de usuario:" autocomplete="off">
+<div class="py-8 md:py-16 mx-auto max-w-screen-xl px-4 2xl:px-0">
+  <h2 class="text-2xl font-semibold text-[var(--gunmetal)] mb-6 px-4">Accede a tu cuenta para continuar:</h2>
+
+  <div class="mx-auto max-w-screen-md px-4 2xl:px-0">
+    <div class="flex flex-col lg:flex-row bg-white border border-[var(--gunmetal)] rounded overflow-hidden">
+
+      <div class="w-full lg:w-1/3 flex items-center justify-center border-b lg:border-b-0 lg:border-r border-[var(--gunmetal)]">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS671hX9LXk6ykl_P5vZzeGBUhKASSFzuD_1w&s" alt="Ilustración de inicio de sesión"
+          class="w-3/4 lg:w-[85%] object-contain py-8" />
+      </div>
+
+      <!-- Form -->
+      <div class="w-full lg:w-2/3 p-6 flex flex-col justify-center bg-[var(--ghost-white)] text-[var(--gunmetal)]">
+        <form (ngSubmit)="logIn()" #loginForm="ngForm" class="space-y-5">
+          <div>
+            <label for="username" class="text-lg font-bold block mb-2">Nombre de usuario</label>
+            <div class="flex items-center bg-white border border-[var(--powder-blue)] rounded focus-within:ring-2 focus-within:ring-[var(--yinmn-blue)]">
+              <i class="fa-solid fa-user text-gray-400 text-sm px-3"></i>
+              <input [(ngModel)]="username" id="username" name="username" type="text" autocomplete="off" placeholder="Ej. michaelw" class="w-full font-medium rounded-r py-2 px-3 leading-tight focus:outline-none placeholder:text-gray-400 placeholder:text-sm placeholder:font-normal"/>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-lg font-bold block mb-2" for="password">Contraseña </label>
+            <div class="flex items-center bg-white border border-[var(--powder-blue)] rounded focus-within:ring-2 focus-within:ring-[var(--yinmn-blue)]">
+              <i class="fa-solid fa-key text-gray-400 text-sm px-3"></i>
+              <input [(ngModel)]="password" [type]="showingPass ? 'text' : 'password'" id="password" name="password" placeholder="Ej. michaelwpass" class="w-full font-medium rounded-r py-2 px-3 leading-tight focus:outline-none placeholder:text-gray-400 placeholder:text-sm placeholder:font-normal"/>
+              <button type="button" (click)="showHidePass()" [attr.aria-pressed]="showingPass" aria-label="{{ showingPass ? 'Ocultar contraseña' : 'Mostrar contraseña' }}" class="px-3 text-gray-400 cursor-pointer hover:text-gray-500 focus:outline-none transition duration-200">
+                <i class="fas" [ngClass]="showingPass ? 'fa-eye-slash' : 'fa-eye'"></i>
+              </button>
+            </div>
+            <p class="text-red-500 text-xs mt-2">{{ error }}</p>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <input type="checkbox" id="rememberMe" name="rememberMe" class="mr-2 cursor-pointer">
+              <label for="rememberMe" class="text-sm text-gray-500 cursor-default">Recuérdame</label>
+            </div>
+            <button class="bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-4 focus:ring-[var(--powder-blue)] transition duration-200 cursor-pointer" type="submit">Iniciar sesión &nbsp;&#xf2f6;</button>
+          </div>
+        </form>
+      </div>
     </div>
-    <div class="mb-4">
-      <label class="block text-gray-700 text-base font-bold mb-2" for="password">Contraseña</label>    
-      <div class="flex items-center border border-red-500 rounded shadow focus-within:shadow-outline">
-        <input [(ngModel)]="password" [type]="showPass ? 'text' : 'password'" class="w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none placeholder:text-gray-400 placeholder:text-sm" id="password" name="password" placeholder="••••••••••••">    
-        <button type="button" (click)="showHidePass()" [attr.aria-pressed]="showPass" aria-label="{{ showPass ? 'Ocultar contraseña' : 'Mostrar contraseña' }}" class="px-3 text-gray-500 cursor-pointer hover:text-gray-700 focus:outline-none"> <i class="fas" [ngClass]="showPass ? 'fa-eye-slash' : 'fa-eye'"></i></button>
-      </div>    
-      <p class="text-red-500 text-xs italic mt-2">{{error}}</p>
-    </div>
-    <div class="flex items-center justify-between">
-      <div class="flex items-center">
-        <input type="checkbox" id="rememberMe" name="rememberMe" class="mr-2 cursor-pointer">
-        <label for="rememberMe" class="text-sm text-gray-700 mt-[2px]">Recuérdame</label>
-      </div>      
-      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">Iniciar sesión</button>      
-    </div>
-  </form>
+  </div>
 </div>
+

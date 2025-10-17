@@ -34,12 +34,12 @@ export class CartService {
     return of(items); // retorna observable
   }
 
-  removeFromCart(id: number): Observable<ProductsData[]> {
-    const items = this.cartItemsSubject.value.filter(p => p.id !== id);
-    this.cartItemsSubject.next(items);
-    this.saveCart();
-    return of(items); // retorna observable
-  }
+  // removeFromCart(id: number): Observable<ProductsData[]> {
+  //   const items = this.cartItemsSubject.value.filter(p => p.id !== id);
+  //   this.cartItemsSubject.next(items);
+  //   this.saveCart();
+  //   return of(items); // retorna observable
+  // }
 
   clearCart(): Observable<ProductsData[]> {
     this.cartItemsSubject.next([]);
@@ -47,24 +47,77 @@ export class CartService {
     return of([]); // retorna observable vacío
   }
 
-
-  // isInCart(productId: number): boolean {
-  //   return this.cartItemsSubject.value.some(p => p.id === productId);
-  // }
-  isInCart(productId: number): boolean {
+  /* Verifica si el producto ya está agregado en el carrito */
+  isInCart(id: number): boolean {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]') as ProductsData[]
-    return cart.some(p => p.id === productId)
+    return cart.some(product => product.id === id)
   }
 
   addToCartFromFavs(product: ProductsData) {
-  const items = [...this.cartItemsSubject.value];
-  const exists = items.find(p => p.id === product.id);
-  if (!exists) {
-    items.push(product);
-    this.cartItemsSubject.next(items);
-    localStorage.setItem('cart', JSON.stringify(items));
+    const items = [...this.cartItemsSubject.value];
+    const exists = items.find(p => p.id === product.id);
+    if (!exists) {
+      items.push(product);
+      this.cartItemsSubject.next(items);
+      localStorage.setItem('cart', JSON.stringify(items));
+    }
   }
+
+
+
+  updateQuantity(productId: number, quantity: number) {
+  const updatedCart = this.cartItemsSubject.value.map(p =>
+    p.id === productId ? { ...p, quantity } : p
+  );
+  this.cartItemsSubject.next(updatedCart);
+  localStorage.setItem('cart', JSON.stringify(updatedCart));
 }
+
+removeFromCart(productId: number) {
+  const updatedCart = this.cartItemsSubject.value.filter(p => p.id !== productId);
+  this.cartItemsSubject.next(updatedCart);
+  localStorage.setItem('cart', JSON.stringify(updatedCart));
+}
+
+
+  increaseQuantity(productId: number, maxStock: number) {
+    const items = this.cartItemsSubject.value;
+    const item = items.find(p => p.id === productId);
+    if (!item) return;
+    if ((item.quantity ?? 1) < maxStock) {
+      item.quantity!++;
+      this.cartItemsSubject.next([...items]);
+      this.saveCart();
+    }
+  }
+
+  decreaseQuantity(productId: number, isCart: boolean = false) {
+    let items = this.cartItemsSubject.value;
+    const item = items.find(p => p.id === productId);
+    if (!item) return;
+
+    if ((item.quantity ?? 1) > 1) {
+      item.quantity!--;
+    } else if (isCart) {
+      // eliminar solo si estamos en /cart
+      items = items.filter(p => p.id !== productId);
+    } else {
+      item.quantity = 1;
+    }
+
+    this.cartItemsSubject.next([...items]);
+    this.saveCart();
+  }
+
+
+
+
+
+
+
+
+
+
 
 
 }

@@ -1,36 +1,35 @@
-<div class="w-full bg-white p-4 shadow-sm border border-gray-200">
-  <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">  
-    <div class="flex flex-col">
-      <label for="list-limit" class="text-sm font-medium text-gray-700">Productos por página:</label>
-      <input id="list-limit" type="number" [(ngModel)]="limit" (ngModelChange)="byLimit(limit)" class="mt-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
+<div class="w-full bg-[var(--ghost-white)] border border-t-0 border-r-0 border-l-0 border-b-[var(--powder-blue)] text-[var(--gunmetal)] p-4">
+  <div class="flex flex-wrap items-center justify-between">
+
+    <div class="flex items-center gap-2">  
+      <i class="fa-solid fa-list-ol font-normal mr-1"></i>
+      <input id="list-limit" type="number" min="0" max="50" [(ngModel)]="limit" (ngModelChange)="byLimit(limit)" class="px-4 py-2 rounded font-semibold text-sm bg-white border border-[var(--powder-blue)] focus:ring-1 focus:ring-[var(--powder-blue)] no-spinner">
+      <label for="list-limit" class="text-base">por página</label>
     </div>
-  
-    <div class="flex flex-col">
-      <label for="filter-by-type" class="text-sm font-medium text-gray-700">Filtrar por tipo:</label>
-      <input id="filter-by-type" type="text" placeholder="Ej: Phone" [(ngModel)]="type" (ngModelChange)="byType(type)" class="mt-1 px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-700">
-    </div>
-  
-    <div class="flex flex-col">
-      <label for="p-categories" class="text-sm font-medium text-gray-700">Categorías:</label>
-      <div class="relative">
-        <select id="p-categories" class="mt-1 block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none text-gray-700 cursor-pointer">
-          <option selected>Lista de categorías</option>
-            @for (category of categories$ | async; track $index) {
-              <option [value]="category" (click)="byCategory(category.name)">{{ category.name }}</option>
-            }
-        </select>
-        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">&#xf107;</div>
+
+    <div class="flex items-center gap-2 flex-wrap">
+      <div class="relative z-0 group">
+        <input type="text" name="floating-type" id="floating-type" [formControl]="byTypeControl" class="w-40 h-[42px] block py-2.5 px-2 text-sm font-semibold capitalize bg-white border border-[var(--powder-blue)] rounded appearance-none focus:outline-none focus:ring-1 focus:ring-[var(--yinmn-blue)] peer placeholder-transparent" placeholder="Por tipo (Ej: Phone)" required/>
+        <label for="floating-type" class="absolute left-2 top-2.5 text-gray-400 text-sm duration-300 transform origin-[0] peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-[28px] peer-focus:scale-80 peer-focus:text-gray-500 peer-focus:bg-transparent bg-white px-1">Por tipo (Ej: Phone)</label>
       </div>
+      <i class="fa-solid fa-sliders mx-2" title="Filtrar resultados"></i>
+      <select id="p-categories" class="w-40 h-[42px] block py-2.5 px-2 border border-[var(--powder-blue)] text-sm text-gray-400 rounded bg-white focus:ring-[var(--yinmn-blue)] cursor-pointer transition duration-200">
+        <option cl value="">Por categoría</option>
+        @for (category of categories$ | async; track $index) {
+          <option class="text-[var(--gunmetal)] cursor-pointer" [value]="category.name" (click)="byCategory(category.name)">{{ category.name }}</option>
+        }
+      </select>
     </div>
-  
-    <div class="flex flex-col">
-      <label class="text-sm font-medium text-gray-700">Orden:</label>
-      <div class="flex gap-2 mt-1">
-        <button (click)="sortBy()" class="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition cursor-pointer">
-          <i [ngClass]="isSortAsc ? 'fa-solid fa-arrow-up-a-z' : 'fa-solid fa-arrow-down-z-a'"></i>{{isSortAsc ? 'Ascendente' : 'Descendente'}}
-        </button>
-        <button (click)="byLimit(limit)" class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg shadow hover:bg-gray-100 transition cursor-pointer"><i class="fas fa-random"></i>Aleatorio</button>
-      </div>
-    </div>  
+
+    <div class="flex items-center gap-2 justify-start md:justify-end">
+      <i class="fa-solid fa-sort mr-1" title="Ordenar"></i>
+      <button (click)="sortBy()" class="flex items-center gap-1 p-2 text-white text-base rounded transition cursor-pointer bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)]" [title]="isSortAsc ? 'Ascendente' : 'Descendente'">
+        <i [ngClass]="isSortAsc ? 'fa-solid fa-arrow-up-a-z' : 'fa-solid fa-arrow-down-z-a'"></i>
+      </button>
+      <button (click)="byLimit(limit)" title="Aleatorio" class="flex items-center text-base text-white gap-1 p-2 rounded bg-[var(--gunmetal)] hover:bg-[var(--gunmetal-shadow)] transition cursor-pointer">
+        <i class="fas fa-random"></i>
+      </button>
+    </div>
+    
   </div>
 </div>

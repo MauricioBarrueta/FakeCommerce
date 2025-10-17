@@ -39,6 +39,21 @@ export class AuthService {
         })
       );
   }
+//   logIn(username: string, password: string): Observable<ProfileInterface> {
+//   return this.http
+//     .post<ProfileInterface & { token: string }>(`${environment.url}/auth/login`, { username, password })
+//     .pipe(
+//       tap((user) => {
+//         if (isPlatformBrowser(this.platformId)) {
+//   localStorage.removeItem('token');   // <-- limpiar token viejo
+//   localStorage.setItem('token', user.token);
+//   localStorage.setItem('user', JSON.stringify(user));
+// }
+//         this.currentUserSubject.next(user);
+//       })
+//     );
+// }
+
 
   /* Verifica si se a iniciado sesión */
   isUserLogged(): boolean {

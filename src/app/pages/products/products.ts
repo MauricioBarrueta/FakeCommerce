@@ -3,12 +3,12 @@ import { ProductsService } from '../../shared/service/products.service';
 import { ProductsData } from './interface/products.interface';
 import { map, Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { NavService } from '../../shared/service/navigation.service';
-import { AuthService } from '../../auth/service/auth.service';
 import { CategoriesInterface } from './interface/categories.interface';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ProductsForm } from './form/form';
+import { CartService } from '../../shared/service/cart.service';
 
 @Component({
   selector: 'app-products',
@@ -19,7 +19,7 @@ import { ProductsForm } from './form/form';
 export class Products implements OnInit {
 
   
-  constructor(private productService: ProductsService, public navService: NavService) {}  
+  constructor(private productService: ProductsService, public navService: NavService, private cartService: CartService) {}  
   
   products$!: Observable<ProductsData[]>
   categories$!: Observable<CategoriesInterface[]>
@@ -27,15 +27,14 @@ export class Products implements OnInit {
   type: string = ''
   sortBy: string = 'asc'; isSortAsc: boolean = true
   limit: number = 10
-  stock!: number  
-  // quantity: number = 1
-
-  MathRef = Math
+  // stock!: number  
+  // MathRef = Math
   readonly stars = [0, 1, 2, 3, 4]   /* Rating Star Icon */
 
   ngOnInit(): void {
     this.getCategories()
-    this.getFeaturedProducts(10)
+    // this.getFeaturedProducts(10)
+    this.filterProductsByType('phone')
   }  
 
   /* Se obtiene la lista de categorías */
@@ -61,7 +60,7 @@ export class Products implements OnInit {
 
   /* Se filtra la lista por la categoría del producto */
   filterProductsByCategory(category: string) {
-    this.products$ = this.productService.getProductsByCategory(category)
+    this.products$ = this.productService.getProductsByCategory(category.split(' ').join('-'))
       .pipe(
         map(res => res.products.map(p => ({ ...p, quantity: 1 })))
       )
@@ -84,18 +83,26 @@ export class Products implements OnInit {
 
   /* Convierte el valor de la calificación (rating) del producto a íconos */
   rateIcon(rate: number, index: number): string {
-    //* Se asegura que el rango siempre sea 0 - 5
-    const range = Math.max(0, Math.min(5, rate))
-    //* Calcula la cantidad de enteros y decimales */
+    const range = Math.max(0, Math.min(5, rate)) //* Se asegura que el rango siempre sea de 0 - 5
     const full = Math.floor(range)
     const half = range - full >= 0.5 && full < 5
 
     /* Convierte el valor a ícono de la estrella (llena, media o vacía) */
-    return index < full ? 'fa-solid fa-star text-[#FFD700]' : index === full && half ? 'fa-solid fa-star-half-stroke text-[#FFD700]' 
-      : 'fa-regular fa-star text-[var(--chinese-silver)]'
+    return index < full ? 'fa-solid fa-star text-yellow-500' : index === full && half ? 'fa-solid fa-star-half-stroke text-yellow-500' 
+      : 'fa-regular fa-star text-[var(--gunmetal)]'
   }
 
-  // redirectToDetails(param: number) {
-  //   this.navService.getProductDetails(param)
-  // }
+  /* Se modifica el texto de la propiedad 'shippingInformation' */
+  getShippingText(text?: string): string {
+    if (!text) return ''
+    return text.replace(/\b(?:Ships in|Ships|In)\b\s*/gi, '').trim()
+  }
+
+  /* Botones + / - */
+  increaseQuantity(product: ProductsData) {
+    this.cartService.increaseQuantity(product.id, product.stock);
+  }
+  decreaseQuantity(product: ProductsData) {
+    this.cartService.decreaseQuantity(product.id, false);
+  }
 }
