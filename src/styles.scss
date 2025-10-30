@@ -3,6 +3,8 @@
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif, FontAwesome; }
 
+//! REVISAR QUE TODO SEA RESPONSIVE, checar eso ya al último
+
 :root {
     --yinmn-blue: #3d5a80; --yinmn-blue-shadow: #5d79a1;
     --powder-blue: #98c1d9; --powder-blue-shadow: #6f98af;
@@ -27,50 +29,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif, FontAwesome
 }
 
 /* Activar animación solamente 1 vez*/
-.anim-count-1 {
+.one-time-animation {
    animation-iteration-count: 1;
 }
 
-
-/* ============================================
-   PALETA DE COLORES – "Urban Depth" (E-commerce)
-   ============================================
-
-   Primario: #3D5A80 (Azul oscuro)
-      - Uso: Botones principales (“Agregar al carrito”, “Comprar ahora”), links destacados, íconos importantes.
-      - Contrasta muy bien con fondos claros y llama la atención del usuario sobre acciones importantes.
-
-   Secundario: #98C1D9 (Azul suave)
-      - Uso: Botones secundarios, hover en botones primarios, tarjetas de productos, backgrounds de secciones menos importantes.
-      - Ayuda a jerarquizar elementos sin competir con el primario.
-
-   Acento: #EE6C4D (Naranja quemado)
-      - Uso: Badges de descuento, alertas, toasts de éxito/error, indicadores de cantidad o promociones.
-      - Sirve para resaltar información importante o estados.
-
-   Fondo: #E0FBFC (Azul muy claro)
-      - Uso: Fondo general de la página, secciones, tarjetas de producto.
-      - Mantiene la interfaz limpia y amplia.
-
-   Texto principal: #293241 (Gris oscuro / azul profundo)
-      - Uso: Titulares, nombres de productos, precios, información importante.
-      - Máxima legibilidad sobre fondos claros.
-
-   Texto secundario: #6B7280 (Gris medio / azul suave)
-      - Uso: Descripciones, subtítulos, placeholders, textos menos importantes.
-      - Permite jerarquía visual sin restar importancia al contenido principal.
-
-   RECOMENDACIONES DE USO
-   - Botones / CTA:
-     - Primario → acciones clave
-     - Secundario → acciones menos importantes
-   - Alertas / mensajes:
-     - Acento → destacar toasts, promociones, errores leves
-   - Fondo / tarjetas:
-     - Fondo → mayor parte de la interfaz
-     - Secundario → bordes o sombras de tarjetas
-   - Textos:
-     - Texto principal → info crítica
-     - Texto secundario → info complementaria o placeholders
-   - Consistencia: Mantener esta asignación para no confundir al usuario
-============================================ */
+.txt-shadow-white { text-shadow: 1px 1px 2px rgba(255,255,255,0.9); }

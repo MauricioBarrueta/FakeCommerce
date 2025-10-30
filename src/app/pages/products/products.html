@@ -2,11 +2,11 @@
 
 <div class="w-full flex flex-wrap justify-center p-4 gap-y-4 gap-x-6">
   @for (product of products$ | async; track product.id) {       
-    <div class="flex flex-wrap w-full max-w-[365px] relative bg-white border border-[var(--gunmetal)] rounded p-4 shadow">
+    <div class="flex flex-wrap w-full max-w-[365px] relative bg-white border border-[var(--gunmetal)] text-[var(--gunmetal)] rounded p-4 shadow-md cursor-default">
     
-      <a class="w-full block relative bg-[var(--ghost-white)] rounded border border-[var(--gunmetal)] mb-2" (click)="navService.getProductDetails(product.id)">
+      <a class="w-full block relative bg-[var(--ghost-white)] rounded border border-[var(--powder-blue)] mb-2" (click)="getProductDetails(product.id)">
         <div class="relative cursor-pointer rounded">
-          <img class="w-full h-[285px] object-contain scale-95 hover:scale-100 transition duration-200 drop-shadow" [src]="product.thumbnail" [alt]="product.title">
+          <img class="w-full h-[285px] object-contain scale-95 hover:scale-100 transition duration-200 drop-shadow-md" [src]="product.thumbnail" [alt]="product.title">
           @if (product.discountPercentage > 0) {
             <span class="absolute top-0 right-0 w-0 h-0 border-t-[60px] border-t-[var(--burnt-sienna)] border-l-[60px] border-l-transparent rounded"></span>
             <span class="absolute top-[8%] right-[4.5%] text-xs font-bold text-white transform rotate-45 translate-x-4 -translate-y-2">
@@ -16,43 +16,42 @@
         </div>
       </a>
 
-      <h5 class="w-full text-xl font-semibold tracking-tight text-[var(--gunmetal)]">{{ product.title }}</h5>
-      <div class="w-full flex flex-col mt-2 mb-4">
+      <h5 class="w-full text-xl font-semibold tracking-tight">{{ product.title }}</h5>
+      <div class="w-full flex flex-col mt-2 mb-8">
         <div class="flex items-center justify-between leading-none">
           <span class="text-lg line-through text-gray-400">${{ getOriginalPrice(product) | number:'1.2-2' }}</span>
           <div class="flex items-baseline space-x-1 rtl:space-x-reverse">
-            <span class="text-sm text-[var(--gunmetal)] font-medium mr-2">({{ product.rating }})</span>
+            <span class="text-sm font-medium mr-2">({{ product.rating }})</span>
             @for (i of stars; track i) {
               <i class="text-base font-hairline " [ngClass]="rateIcon(product.rating, i)"></i>
             }
           </div>
         </div>
         <div class="mt-1">
-          <span class="text-3xl font-bold text-[var(--gunmetal)]">${{ product.price | number:'1.2-2' }}</span>
+          <span class="text-3xl font-bold">${{ product.price | number:'1.2-2' }}</span>
         </div>
       </div>
     
-      <div class="relative flex items-center justify-between flex-wrap p-2 rounded text-[var(--gunmetal)] bg-[var(--light-cyan)] border border-[var(--yinmn-blue)]">
-        <!--! NO FUNCIONAN -->
+      <div class="relative flex items-center justify-between flex-wrap">
         <div class="flex items-center space-x-3">
-          <button (click)="decreaseQuantity(product)" class="w-[26px] h-[38px] px-2 py-1 mr-0 rounded bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] text-white transition duration-200 cursor-pointer rounded-r-none">-</button>
-          <input type="number" [max]="product.stock" [min]="1" [value]="product.quantity ?? 1" id="counter-input" data-input-counter class="w-10 h-[38px] border border-[var(--powder-blue)] bg-white text-center text-sm font-medium focus:outline-none focus:ring-0 no-spinner">
-          <button (click)="increaseQuantity(product)" class="w-[26px] h-[38px] px-2 py-1 rounded bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] text-white transition duration-200 cursor-pointer rounded-l-none">+</button>
+          <button (click)="decreaseQuantity(product)" class="w-[26px] h-[38px] px-2 py-1 mr-0 rounded bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] text-white transition duration-200 cursor-pointer rounded-r-none font-medium">-</button>
+          <input type="number" [max]="product.stock" [min]="1" [(ngModel)]="product.quantity" id="counter-input" class="w-10 h-[38px] border border-[var(--powder-blue)] bg-white text-center text-sm font-medium focus:outline-none focus:ring-0 no-spinner selection:bg-transparent border-r-0 border-l-0 cursor-default" readonly>
+          <button (click)="increaseQuantity(product)" class="w-[26px] h-[38px] px-2 py-1 rounded bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] text-white transition duration-200 cursor-pointer rounded-l-none font-medium">+</button>
         </div>
 
-        <div class="flex items-center flex-col cursor-default">
-          <span class="flex items-center text-sm font-medium">{{ product.availabilityStatus }} 
-            <i class="fa-solid text-xs ml-1" [ngClass]="{ 'fa-check-circle text-green-500': product.availabilityStatus === 'In Stock', 'fa-exclamation-triangle text-yellow-500': product.availabilityStatus === 'Low Stock', 'fa-times-circle text-red-500': product.availabilityStatus === 'Out of Stock' }"></i>
+        <div class="flex items-center flex-col">
+          <span class="flex items-center text-sm font-medium">{{ product.availabilityStatus === 'In Stock' || product.availabilityStatus === 'Low Stock' ? 'Existente' : 'Agotado' }} 
+            <i class="fa-solid text-xs ml-1 mb-[3px] scale-90" [ngClass]="{ 'fa-check-circle text-green-500': product.availabilityStatus === 'In Stock', 'fa-exclamation-triangle text-yellow-500': product.availabilityStatus === 'Low Stock', 'fa-times-circle text-red-500': product.availabilityStatus === 'Out of Stock' }"></i>
           </span>
           <span class="m-0 mt-1 text-xs text-gray-500">(+{{ product.stock }} {{ product.stock === 1 ? 'disponible' : 'disponibles' }})</span>
         </div>
 
         <div class="flex gap-2">
-          <button type="button" class="flex items-center py-2 px-3 text-white text-sm rounded transition cursor-pointer bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)]" (click)="navService.onAddToCart(product)" title="Carrito">&#xf217;</button>
-          <button type="button" class="flex items-center py-2 px-3 text-[var(--gunmetal)] text-sm font-medium rounded transition cursor-pointer border border-[var(--yinmn-blue)] text-[var(--yinmn-blue)] bg-white hover:bg-[var(--yinmn-blue)] hover:text-white" title="Comprar">&#xf09d;</button>
+          <button type="button" class="flex items-center py-2 px-3 text-white text-sm rounded transition cursor-pointer bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] border border-[var(--yinmn-blue)]" (click)="onAddToCart(product)" title="Agregar al carrito">&#xf217;</button>
+          <button type="button" class="flex items-center py-2 px-3 text-sm font-medium rounded transition cursor-pointer border border-[var(--yinmn-blue)] text-[var(--yinmn-blue)] bg-white hover:bg-[var(--yinmn-blue)] hover:text-white" title="Comprar" (click)="onPurchase(product)">&#xf788;</button>
         </div>
 
-        <div class="w-full flex items-center justify-between text-xs text-gray-500 capitalize mt-2 cursor-default">
+        <div class="w-full flex items-center justify-evenly text-xs text-gray-500 capitalize mt-3">
           <p><i class="fa-solid fa-truck-fast text-gray-400 mr-1"></i>{{ getShippingText(product.shippingInformation) }}</p>
           <p><i class="fa-solid fa-shield-halved text-gray-400 mr-1"></i>{{ product.warrantyInformation }}</p>
         </div>

@@ -8,7 +8,6 @@ import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
   selector: 'app-form',
   imports: [FormsModule, CommonModule, ReactiveFormsModule],
   templateUrl: './form.html',
-  styleUrl: './form.scss'
 })
 export class ProductsForm implements OnInit {
   
@@ -32,7 +31,7 @@ export class ProductsForm implements OnInit {
       .subscribe(value => this.filterByType.emit(value ?? '')); //* Se asegura que si el valor es nulo se envíe un valor vacío
   }
 
-  /* Métodos que filtran los resultados de acuerdo a su categoría, tipo, orden y por límite */
+  /* Métodos que filtran los resultados de acuerdo a su categoría, límite, tipo, orden */
   byCategory(category: string) { 
     this.filterByCategory.emit(category) 
   }

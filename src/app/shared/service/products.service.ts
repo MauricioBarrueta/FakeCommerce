@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { catchError, map, Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ProductsData, ProductsResponse } from '../../pages/products/interface/products.interface';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment.development';
@@ -12,37 +12,38 @@ export class ProductsService {
 
   constructor(private http: HttpClient) {}
 
-  /* Se listan x cantidad de productos */
+  /* Se obtiene x cantidad de productos */
   getFeaturedProducts(limit: number): Observable<ProductsResponse> {
     return this.http.get<ProductsResponse>(`${environment.url}/products?limit=${limit}`)         
   }  
 
-  /* Se obtienen los productos por su tipo */
+  /* Se obtienen los productos de acuerdo a su tipo */
   getProductByType(type: string): Observable<ProductsResponse> {
     return this.http.get<ProductsResponse>(`${environment.url}/products/search?q=${type}`)
   }
 
-  /* Se ordena la lista (ascendente o descendente) */
-  sortProducts(sortBy: string, limit: number): Observable<ProductsResponse> {
-    return this.http.get<ProductsResponse>(`${environment.url}/products?sortBy=title&order=${sortBy}&limit=${limit}`)
+  /* Ordena los resultados de manera ascendente o descendente de acuerdo al nombre del producto */
+  sortProducts(sortBy: string, limit?: number): Observable<ProductsResponse> {
+    return this.http.get<ProductsResponse>(`${environment.url}/products?sortBy=title&order=${sortBy}`)
   }
 
-  /* Se obtienen todos los detalles del producto */
+  /* Se obtienen los detalles del producto mediante su id */
   getProductDetails(id: number): Observable<ProductsData> {
     return this.http.get<ProductsData>(`${environment.url}/products/${id}`)      
   } 
 
-  /* Se listan las categorías de los productos */
+  /* Se Obtienen todas las categorías de productos */
   getCategories(): Observable<CategoriesInterface[]> {
     return this.http.get<CategoriesInterface[]>(`${environment.url}/products/categories`)
   }
 
-  /* Se listan todos los productos correspondientes a la categoría */
+  /* Se filtran los resultados de acuerdo a su categoría */
   getProductsByCategory(category: string, limit?: number): Observable<ProductsResponse> {
-    let url = `${environment.url}/products/category/${category}`
-    if(limit) {
-      url += `?limit=${limit}`
-    }
-    return this.http.get<ProductsResponse>(url)
+    return this.http.get<ProductsResponse>(`${environment.url}/products/category/${category}`)
+    // let url = `${environment.url}/products/category/${category}`
+    // if(limit) {
+    //   url += `?limit=${limit}`
+    // }
+    // return this.http.get<ProductsResponse>(url)
   } 
 }

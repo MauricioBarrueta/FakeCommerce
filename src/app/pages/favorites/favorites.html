@@ -5,36 +5,42 @@
     <div class="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
       <!-- Card -->
       <div class="w-full flex-none">
+
+        @if(isFavsEmpty){
+          <span class="text-sm font-semibold text-red-500 opacity-65 cursor-default">Tu lista de favoritos está vacía, agrega productos que te gusten y guárdalos para más tarde<i class="fa-solid fa-heart-circle-plus font-normal ml-2"></i></span>
+        }
         <div class="space-y-6">
           @for (product of favsList$ | async; track $index) {
-            <div class="rounded border border-[var(--gunmetal)] bg-white text-[var(--gunmetal)] p-4">
+            <div class="rounded border border-[var(--gunmetal)] bg-white text-[var(--gunmetal)] p-4 shadow-md cursor-default">
               <div class="space-y-4 md:flex md:items-center md:justify-start md:gap-6 md:space-y-0">
                 <a class="shrink-0 md:order-1" (click)="getProductDetails(product.id)">
-                  <img class="h-32 w-32 hover:scale-105 transition duration-200 linear cursor-pointer" [src]="product.images[0]" [alt]="product.title">
+                  <img class="h-32 w-32 scale-95 hover:scale-100 transition duration-200 linear cursor-pointer drop-shadow-md" [src]="product.images[0]" [alt]="product.title">
                 </a>
 
                 <div class="flex justify-center items-center md:order-3 py-4">
                   <div class="ml-6 text-center">
-                    <p class="text-xl font-bold">${{ product.price | number:'1.2-2' }} <span class="text-sm font-normal text-[var(--burnt-sienna)] ml-1">-{{ product.discountPercentage }}%</span></p>
-                    <p class="text-sm font-medium mt-2">Estado: <span class="ml-1" [ngClass]="product.stock > 0 ? 'text-green-500' : 'text-red-500'">{{ product.stock > 0 ? 'En stock' : 'Agotado' }}</span></p>
+                    <p class="text-xl font-bold">${{ product.price | number:'1.2-2' }} <span class="text-sm font-medium text-[var(--burnt-sienna)] ml-1">-{{ product.discountPercentage }}%</span></p>
+                    <p class="text-base font-medium text-gray-500 mt-2">
+                      Estado:<span class="ml-2" [ngClass]="product.stock > 0 ? 'text-green-500' : 'text-red-500'">{{ product.stock > 0 ? 'Disponible' : 'Agotado' }}</span>
+                    </p>
                   </div>
                 </div>
             
                 <div class="w-full min-w-0 flex-1 space-y-4 md:order-2 cursor-default">
-                  <p class="text-lg font-medium mb-1">{{product.title}}</p>
+                  <p class="text-lg font-medium mb-2">{{product.title}}</p>
                   <p class="text-base">{{product.description}}</p>
             
                   <div class="flex items-center gap-4">
                     <button [disabled]="isInCart(product.id)" (click)="addToCartFromFav(product)" class="rounded text-sm font-medium transition duration-200 flex items-center gap-2"
-                      [ngClass]="isInCart(product.id) ? 'bg-transparent text-gray-500 cursor-default' : 'px-4 py-2 bg-[var(--yinmn-blue)] text-white hover:bg-[var(--yinmn-blue-shadow)] cursor-pointer'">
-                      <i class="fa-solid" [ngClass]="isInCart(product.id) ? 'fa-square-check' : 'fa-cart-plus'"></i>{{ isInCart(product.id) ? 'Agregado' : 'Agregar al carrito' }}
+                      [ngClass]="isInCart(product.id) ? 'bg-transparent text-gray-500 cursor-default' : 'px-4 py-2 bg-[var(--yinmn-blue)] border border-[var(--yinmn-blue)] text-white hover:bg-[var(--yinmn-blue-shadow)] cursor-pointer'">
+                      <i class="fa-solid" [ngClass]="isInCart(product.id) ? 'fa-square-check text-gray-400' : 'fa-cart-plus'"></i>{{ isInCart(product.id) ? 'Agregado' : 'Agregar al carrito' }}
                     </button>
                     @if (isInCart(product.id)) {
                       <button [routerLink]="['/cart']" class="flex items-center gap-2 px-4 py-2 rounded border border-[var(--yinmn-blue)] text-[var(--yinmn-blue)] text-sm bg-white hover:bg-[var(--yinmn-blue)] hover:text-white transition duration-200 cursor-pointer">
                         <i class="fa-solid fa-cart-shopping"></i><span>Ver en el carrito</span>
                       </button>
                     }
-                    <button type="button" (click)="removeFavorite(product)" class="text-sm text-red-500 hover:text-red-600 transition duration-200 cursor-pointer flex items-center gap-1"><i class="fa-solid fa-trash-can"></i>Eliminar</button>
+                    <button type="button" (click)="confirmDelete(product)" class="text-sm text-red-500 hover:text-red-600 transition duration-200 cursor-pointer flex items-center gap-1"><i class="fa-solid fa-trash"></i>Eliminar</button>
                   </div>
                 </div>
               </div>

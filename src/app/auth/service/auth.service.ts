@@ -11,51 +11,41 @@ import { ProfileInterface } from '../../pages/profile/interface/profile.interfac
 })
 export class AuthService {
 
+  //? BehaviorSubject es un tipo de Observable que siempre almacena y emite su último valor a todas las suscripciones
+  
+  /* Almacena el estado del usuario (con sesión iniciada o no iniciada) */
   private currentUserSubject = new BehaviorSubject<ProfileInterface | null>(null)
   user$ = this.currentUserSubject.asObservable()
 
-  /* Para evitar que se pierdan los productos que se quieren agregar sin haber iniciado sesión */
+  /* Almacena el estado del producto que se quiere agregar al carrito cuando no ha iniciado sesión */
   private pendingProductSubject = new BehaviorSubject<ProductsData | null>(null)
   pendingProduct$ = this.pendingProductSubject.asObservable()
 
   constructor(private http: HttpClient, @Inject(PLATFORM_ID) private platformId: object) {
     if (isPlatformBrowser(this.platformId)) {
-      const savedUser = localStorage.getItem('user');
+      /* Se recupera la sesión del usuario guardada en localStorage para mantener la sesión activa */
+      const savedUser = localStorage.getItem('user')
       if (savedUser) {
-        this.currentUserSubject.next(JSON.parse(savedUser));
+        this.currentUserSubject.next(JSON.parse(savedUser))
       }
     }
   }
 
+  /* Verifica si las credenciales son validas para iniciar sesión */
   logIn(username: string, password: string): Observable<ProfileInterface> {
-    return this.http
-      .post<ProfileInterface>(`${environment.url}/auth/login`, { username, password })
+    return this.http.post<ProfileInterface>(`${environment.url}/auth/login`, { username, password })
       .pipe(
         tap((user) => {
+          /* Guarda los datos y actualiza el estado del usuario para mantener la sesión iniciada aunque se cierre o recarge la página */
           if (isPlatformBrowser(this.platformId)) {
-            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('user', JSON.stringify(user))
           }
-          this.currentUserSubject.next(user);
+          this.currentUserSubject.next(user)
         })
       );
   }
-//   logIn(username: string, password: string): Observable<ProfileInterface> {
-//   return this.http
-//     .post<ProfileInterface & { token: string }>(`${environment.url}/auth/login`, { username, password })
-//     .pipe(
-//       tap((user) => {
-//         if (isPlatformBrowser(this.platformId)) {
-//   localStorage.removeItem('token');   // <-- limpiar token viejo
-//   localStorage.setItem('token', user.token);
-//   localStorage.setItem('user', JSON.stringify(user));
-// }
-//         this.currentUserSubject.next(user);
-//       })
-//     );
-// }
 
-
-  /* Verifica si se a iniciado sesión */
+  /* Verifica si la sesión sigue activa */
   isUserLogged(): boolean {
     return this.currentUserSubject.value !== null;
   }
@@ -63,31 +53,33 @@ export class AuthService {
   /* Cierra la sesión, eliminando el registro de localStorage y limpiando la memoria de BehaviorSubject */
   logOut(): void {
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('user');
+      localStorage.removeItem('user')
     }
-    this.currentUserSubject.next(null);
+    this.currentUserSubject.next(null)
   }
 
-  // Producto pendiente
+  /* Almacena temporalmente y actualiza el estado del producto que se quizo agregar sin haber iniciado sesión  */
   setPendingProduct(product: ProductsData) {
-    this.pendingProductSubject.next(product);
+    this.pendingProductSubject.next(product)
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('pendingProduct', JSON.stringify(product));
+      localStorage.setItem('pendingProduct', JSON.stringify(product))
     }
   }
 
+  /* Verifica si existe un producto pendiente en localStorage y lo devuelve como objeto (ProductsData) o como 'null' si no existe */
   getPendingProduct(): ProductsData | null {
     if (isPlatformBrowser(this.platformId)) {
-      const stored = localStorage.getItem('pendingProduct');
-      return stored ? JSON.parse(stored) : null;
+      const stored = localStorage.getItem('pendingProduct')
+      return stored ? JSON.parse(stored) : null
     }
-    return null;
+    return null
   }
 
+  /* Elimina el producto pendiente del localStorage y cambia el estado a 'null' una vez agregado al carrito */
   clearPendingProduct() {
-    this.pendingProductSubject.next(null);
+    this.pendingProductSubject.next(null)
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('pendingProduct');
+      localStorage.removeItem('pendingProduct')
     }
   }
 }

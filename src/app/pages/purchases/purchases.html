@@ -1,55 +1,75 @@
 <section class="py-8 md:py-16">
   <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
-    <!-- <h2 class="text-2xl font-semibold text-[var(--gunmetal)]">Tu lista de compras:</h2> -->
     <div class="flex items-center justify-between">
       <h2 class="text-2xl font-semibold text-[var(--gunmetal)]">Tu lista de compras:</h2>
-      <button (click)="clearAllPurchases()" class="flex items-center gap-2 px-4 py-2 rounded border border-[var(--burnt-sienna)] text-red-500 text-sm bg-white hover:bg-[var(--yinmn-blue)] hover:text-white hover:border-[var(--yinmn-blue)] transition duration-200 cursor-pointer">
-        <i class="fa-solid fa-broom"></i>Vaciar lista
-      </button>
+      @if(purchase.length > 0) {
+        <button (click)="clearPurchasesList()" class="flex items-center gap-2 px-4 py-2 rounded border border-[var(--burnt-sienna)] text-red-500 text-sm bg-white hover:bg-[var(--yinmn-blue)] hover:text-white hover:border-[var(--yinmn-blue)] transition cursor-pointer">
+          <i class="fa-solid fa-trash-can-arrow-up"></i>Vaciar lista
+        </button>
+      }      
     </div>
-
-    <div class="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
+    <div class="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">     
       <!-- Card -->
       <div class="w-full flex-none">
+        @if(purchase.length === 0) {
+          <span class="text-sm font-semibold text-red-500 opacity-65 cursor-default">Tu lista de compras está vacía. Agrega al carrito los productos que te gusten y realiza tu primera compra<i class="fa-solid fa-cart-arrow-down font-normal ml-2"></i></span>
+        }
         <div class="space-y-6">
           @for (purchase of purchases$ | async; track $index) {
-            <div class="flex items-center gap-2 text-base text-gray-500 font-medium mb-0 px-4 pt-4 rounded-t bg-white border border-[var(--gunmetal)] border-b-0">
-              <i class="fa-solid fa-calendar text-gray-400 font-normal"></i>{{ purchase.date | date:'yyyy-MM-dd' }}
-              <i class="fa-regular fa-clock text-gray-400 font-normal ml-auto"></i>{{ purchase.date | date:'h:mm a' }}
+            <div class="flex items-center gap-2 text-base text-gray-500 font-medium mb-0 px-4 pt-4 rounded-t bg-white border border-[var(--gunmetal)] border-b-0 shadow-md cursor-default">
+              <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-calendar text-gray-400 font-normal"></i>
+                <span class="text-gray-500">Fecha de compra:</span>
+                <span class="text-[var(--gunmetal)]">{{ purchase.date | date:'mediumDate' }}</span>
+              </div>
+              <div class="flex items-center space-x-2 ml-auto">
+                <i class="fa-regular fa-clock text-gray-400 font-normal"></i>
+                <span class="text-gray-500">Hora:</span>
+                <span class="text-[var(--gunmetal)]">{{ purchase.date | date:'h:mm a' }}</span>
+              </div>
             </div>
-
             <!-- Product Card -->        
-            <div class="relative rounded-b border border-[var(--gunmetal)] border-t-0 bg-white text-[var(--gunmetal)] p-4 space-y-4">
+            <div class="relative rounded-b border border-[var(--gunmetal)] border-t-0 bg-white text-[var(--gunmetal)] p-4 space-y-4 cursor-default">
               @for (product of purchase.items; track $index) {
-                <div class="space-y-4 md:flex md:items-center md:justify-start md:gap-6 md:space-y-0 p-4 bg-[var(--ghost-white)] border border-[var(--powder-blue)] rounded">
-                  <a class="shrink-0 md:order-1">
-                    <img class="h-24 w-24 hover:scale-105 transition duration-200 linear cursor-pointer" [src]="product.images[0]" [alt]="product.title">
+                <div class="space-y-4 md:flex md:items-center md:justify-start md:gap-6 md:space-y-0 p-4 bg-[var(--ghost-white)] border border-[var(--powder-blue)] rounded" [ngClass]="{ 'mb-2': $index === purchase.items.length - 1 }">
+                  <a (click)="getProductData(product.id)" class="shrink-0 md:order-1">
+                    <img class="h-24 w-24 scale-95 hover:scale-100 transition duration-200 linear cursor-pointer drop-shadow-md" [src]="product.images[0]" [alt]="product.title">
                   </a>
 
                   <div class="flex justify-center items-center md:order-3 py-4">
                     <div class="ml-6 text-center">
-                      <p class="text-lg font-bold">${{ product.price | number:'1.2-2' }} <span class="text-sm font-normal text-[var(--burnt-sienna)] ml-1">-{{ product.discountPercentage }}%</span></p>
+                      <p class="text-lg font-bold">${{ product.price | number:'1.2-2' }} <span class="text-sm font-medium text-[var(--burnt-sienna)] ml-2">-{{ product.discountPercentage }}%</span></p>
                     </div>
                   </div>
             
                   <div class="w-full min-w-0 flex-1 space-y-4 md:order-2 cursor-default">
                     <p class="font-medium mb-1">{{product.title}}</p>
-                    <p class="text-sm">{{product.description}}</p>         
-                  </div>
+                    <p class="text-sm">{{product.description}}</p>     
+                    
+                    <div class="flex items-center space-x-2 text-sm">
+                      <span class="text-gray-500">Cantidad:</span>
+                      <span class="text-[var(--gunmetal)]">{{ product.quantity }}</span>
+                      <span class="text-gray-500">{{product.quantity == 1 ? 'producto' : 'productos'}}</span>
+                    </div>  
+                  </div>   
                 </div>
               }
 
-              <div class="flex justify-between items-center p-4 mb-6 bg-[var(--ghost-white)] rounded border border-[var(--powder-blue)]">
-                <div class="flex items-center text-sm font-semibold" [ngClass]="{'text-green-500': purchase.status === 'Entregado', 'text-yellow-500': purchase.status === 'Pendiente'}">
-                  <i class="fa-solid fa-box-open text-gray-400"></i>&nbsp; {{ purchase.status }}
+              <div class="flex justify-between items-center p-4  bg-[var(--ghost-white)] rounded border border-[var(--powder-blue)]">
+                <div class="flex items-center space-x-2 font-medium">
+                  <i class="fa-solid fa-box-open text-gray-400 font-normal"></i>
+                  <span class="text-gray-500">Estatus:</span>
+                  <span class="font-semibold" [ngClass]="{'text-green-500': purchase.status === 'Entregado', 'text-yellow-500': purchase.status === 'Pendiente'}">{{ purchase.status }}</span>
                 </div>
               
-                <div class="text-lg font-bold text-gray-800 flex items-center gap-1">
-                  <i class="fa-solid fa-money-bill-wave text-gray-400 mr-1"></i>${{ purchase.total | number:'1.2-2' }}
+                <div class="flex items-center space-x-2 font-medium">
+                  <i class="fa-solid fa-money-bill-wave text-gray-400 font-normal"></i>
+                  <span class="text-gray-500">Total:</span>
+                  <span class="font-semibold">${{ purchase.total | number:'1.2-2' }}</span>
                 </div>
               </div>
 
-              <button (click)="deletePurchase(purchase.id)" class="absolute right-4 bottom-3 text-xs text-red-500 hover:text-red-600 transition duration-200 cursor-pointer">&#xf1f8;&nbsp; Eliminar</button>
+              <button (click)="deletePurchase(purchase.id)" class="text-sm text-red-500 hover:text-red-600 transition duration-200 cursor-pointer"><i class="fa-solid fa-trash"></i>&nbsp; Eliminar</button>
             </div>
           }
         </div>
@@ -57,23 +77,3 @@
     </div>
   </div>
 </section>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!--! FALTA VERIFICAR QUE CUANDO SE CIERRE SESIÓN Y ESTÉ EN UNA RUTA PROTEGIDA REDIRECCIONE A /products -->
-<!--* ya lo hice no recuedro si en cart o en profile -->

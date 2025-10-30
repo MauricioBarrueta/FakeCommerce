@@ -3,38 +3,34 @@ import { ProductsService } from '../../shared/service/products.service';
 import { ProductsData } from './interface/products.interface';
 import { map, Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { NavService } from '../../shared/service/navigation.service';
 import { CategoriesInterface } from './interface/categories.interface';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ProductsForm } from './form/form';
 import { CartService } from '../../shared/service/cart.service';
-
+import { ModalService } from '../../shared/modal/service/modal.service';
 @Component({
   selector: 'app-products',
   imports: [CommonModule, RouterModule, FormsModule, ProductsForm, ReactiveFormsModule],
   templateUrl: './products.html',
-  styleUrl: './products.scss'
 })
 export class Products implements OnInit {
-
   
-  constructor(private productService: ProductsService, public navService: NavService, private cartService: CartService) {}  
+  constructor(private productService: ProductsService, private navService: NavService, private cartService: CartService, private router: Router, private modalService: ModalService) {}  
   
   products$!: Observable<ProductsData[]>
   categories$!: Observable<CategoriesInterface[]>
-
   type: string = ''
-  sortBy: string = 'asc'; isSortAsc: boolean = true
-  limit: number = 10
-  // stock!: number  
-  // MathRef = Math
-  readonly stars = [0, 1, 2, 3, 4]   /* Rating Star Icon */
+  sortBy: string = 'asc'
+  isSortAsc: boolean = true
+  // limit: number = 10
+  readonly stars = [0, 1, 2, 3, 4]
 
   ngOnInit(): void {
     this.getCategories()
     // this.getFeaturedProducts(10)
-    this.filterProductsByType('phone')
+    this.filterProductsByType('laptop')
   }  
 
   /* Se obtiene la lista de categorías */
@@ -42,15 +38,21 @@ export class Products implements OnInit {
     this.categories$ = this.productService.getCategories()
   }
 
-  /* Se Obtienen 10 productos para mostrarlos como destacados */
+  /* Se lista la cantidad de productos de acuerdo al parámetro limit */
   getFeaturedProducts(limit: number) {
-    this.products$ = this.productService.getFeaturedProducts(limit)
+    if(limit > 0) {
+      this.products$ = this.productService.getFeaturedProducts(limit)
       .pipe(
+        //* Se agrega la propiedad quantity a cada producto usando 'spread operator'
         map(res => res.products.map(p => ({ ...p, quantity: 1 })))
       )
+    } 
+    if(limit > 25) {
+      this.showAlert(`\u{f05a}`, `Mostrando +25 productos`, 'Recuerda que mientras más productos se muestren, la carga podría tardar algunos segundos')
+    }    
   }
 
-  /* Se filtra la lista por el tipo de producto */
+  /* Se filtra la lista de productos de acuerdo al tipo de producto */
   filterProductsByType(type: string) {
     this.products$ = this.productService.getProductByType(type)
       .pipe(
@@ -58,7 +60,7 @@ export class Products implements OnInit {
       )
   }
 
-  /* Se filtra la lista por la categoría del producto */
+  /* Se filtra la lista de productos de acuerdo a su categoría */
   filterProductsByCategory(category: string) {
     this.products$ = this.productService.getProductsByCategory(category.split(' ').join('-'))
       .pipe(
@@ -66,43 +68,80 @@ export class Products implements OnInit {
       )
   }
 
-  /* Se ordenan la lista de productos de manera ascendente o descendente de acuerdo a su título */
+  /* Ordena la lista de forma ascendente o descendente, tomando como referencia el nombre del producto */
   sortListByTitle() {
     this.isSortAsc = !this.isSortAsc
     this.sortBy = this.isSortAsc ? 'asc' : 'desc'
-    this.products$ = this.productService.sortProducts(this.sortBy, this.limit)
+    this.products$ = this.productService.sortProducts(this.sortBy)
       .pipe(
         map(res => res.products.map(p => ({ ...p, quantity: 1 })))
       )
   }  
 
-  /* Calcula el precio original de un producto antes de aplicar el descuento (originalPrice = precioConDescuento / (1 - (descuento / 100)) */
+  /* Calcula el precio original del producto antes de aplicar el descuento (originalPrice = precioConDescuento / (1 - (descuento / 100)) */
   getOriginalPrice(product: ProductsData): number {
     return +(product.price / (1 - product.discountPercentage / 100)).toFixed(2)
   }
 
-  /* Convierte el valor de la calificación (rating) del producto a íconos */
+  /* Convierte la calificación numérica (rating) y la retorna como íconos */
   rateIcon(rate: number, index: number): string {
     const range = Math.max(0, Math.min(5, rate)) //* Se asegura que el rango siempre sea de 0 - 5
     const full = Math.floor(range)
     const half = range - full >= 0.5 && full < 5
 
-    /* Convierte el valor a ícono de la estrella (llena, media o vacía) */
     return index < full ? 'fa-solid fa-star text-yellow-500' : index === full && half ? 'fa-solid fa-star-half-stroke text-yellow-500' 
-      : 'fa-regular fa-star text-[var(--gunmetal)]'
+      : 'fa-regular fa-star text-gray-500'
   }
 
-  /* Se modifica el texto de la propiedad 'shippingInformation' */
+  /* Omite las palabras 'Ships' y 'Ships In' de la propiedad shippingInformation */
   getShippingText(text?: string): string {
     if (!text) return ''
     return text.replace(/\b(?:Ships in|Ships|In)\b\s*/gi, '').trim()
   }
 
-  /* Botones + / - */
+  /* Se incrementa o disminuye el valor de la propiedad local 'quantity' en Cart, siempre respetando los rangos ( 1 - stock ) */
   increaseQuantity(product: ProductsData) {
-    this.cartService.increaseQuantity(product.id, product.stock);
-  }
+    if ((product.quantity ?? 1) < product.stock) {
+      this.cartService.increaseQuantity(product.id)
+      product.quantity = (product.quantity ?? 1) + 1
+    }
+  }  
   decreaseQuantity(product: ProductsData) {
-    this.cartService.decreaseQuantity(product.id, false);
+    if ((product.quantity ?? 1) > 1) {
+      this.cartService.decreaseQuantity(product.id)
+      product.quantity = (product.quantity ?? 1) - 1
+    }
+  }
+
+  /* Redirige a los detalles del producto seleccionado */
+  getProductDetails(id: number) {
+    this.navService.getProductDetails(id)
+  }
+
+  /* Agrega el producto al carrito, agregando el valor de 'quantity' o '1' por defecto */
+  onAddToCart(product: ProductsData) {
+    const productToAdd = { ...product, quantity: product.quantity ?? 1 }
+    this.navService.onAddToCart(productToAdd)
+    this.showAlert(`\u{f218}`, 'Agregado al carrito', 'El producto se ha añadido correctamente a tu carrito')
+  }  
+
+  /* Redirige a /cart para realizar la compra directamente */
+  onPurchase(product: ProductsData) {
+    const productToAdd = { ...product, quantity: product.quantity ?? 1 }
+    this.navService.onAddToCart(productToAdd)
+    this.router.navigate(['/cart'])
+  }
+  
+  /* Muestra una ventana emergente como alert después de agregar un producto a Cart */
+  showAlert(icon: string, title: string, text: string) {
+    this.modalService.showModal({
+      icon: icon,
+      title: title,
+      text: text,
+      isAlert: true, 
+      type: 'info', 
+      confirmText: 'Entendido',  
+      onConfirm: () => console.log('Close')
+    });
   }
 }

@@ -2,46 +2,43 @@
   <div class="py-8 md:py-16">
     <div class="max-w-screen-xl px-4 mx-auto 2xl:px-0">
       <div class="flex flex-col lg:flex-row lg:gap-8 xl:gap-16 items-start">   
-        
-        <!-- Images -->
+        <!-- Img -->
         <div class="flex gap-6 max-w-lg lg:max-w-xl mx-auto flex-1">
           <div class="flex flex-col gap-3 w-20">
             @for (thumb of product.images; track $index) {
-              <img [src]="thumb" [alt]="product.title" (click)="onSelectImage(thumb)" class="w-20 h-20 object-cover bg-white border rounded cursor-pointer transition-colors duration-200 hover:border-[var(--burnt-sienna)]"
-                [ngClass]="{'border-[var(--burnt-sienna)]': selectedImg === thumb,'border-[var(--gunmetal)]': selectedImg !== thumb}">
+              <img [src]="thumb" [alt]="product.title" (click)="onSelectImage(thumb)" class="w-20 h-20 object-cover p-2 bg-white border rounded cursor-pointer transition-colors duration-200 hover:border-[var(--burnt-sienna)] drop-shadow-md" [ngClass]="{ 'border-[var(--burnt-sienna)]': selectedImg === thumb, 'border-[var(--gunmetal)]': selectedImg !== thumb }">
             }
           </div>
-          <div class="flex-1">
-            <img class="w-full rounded bg-white border border-[var(--gunmetal)]" [src]="selectedImg || product.images[0]" [alt]="product.title">
-            <p class="mb-0 mt-6 text-center font-medium text-[var(--gunmetal)]">{{ product.description }}</p>
+          <div class="flex-1 relative overflow-hidden rounded bg-white border border-[var(--gunmetal)] p-4 drop-shadow-md">
+            @if (prevImg) {
+              <img [src]="prevImg" alt="" class="absolute inset-0 w-full h-full object-contain transition-opacity duration-1000 opacity-0">
+            }
+            <img [src]="selectedImg || product.images[0]" class="w-full h-full object-contain transition-opacity duration-500 opacity-100">
           </div>
         </div>
 
         <!-- Info -->
-        <div class="w-full max-w-[665px] mt-6 sm:mt-8 lg:mt-0 p-4 rounded bg-white text-[var(--gunmetal)] border border-[var(--gunmetal)]">
+        <div class="w-full max-w-[665px] mt-6 sm:mt-8 lg:mt-0 p-4 rounded bg-white text-[var(--gunmetal)] border border-[var(--gunmetal)] cursor-default shadow-md">
           <div class="flex items-center justify-between">
             <h1 class="text-xl font-semibold text-[var(--gunmetal)] sm:text-2xl flex items-baseline gap-2">
-              {{product.title}}
-              <span class="text-xs text-gray-500 font-normal">({{ product.brand }})</span>
+              {{product.title}}<span class="text-xs text-gray-500 font-normal">({{ product.brand }})</span>
             </h1>   
-            <button (click)="addToFavs()" [ngClass]="{'text-red-500': isFav, 'text-gray-400': !isFav}" class="text-xl hover:text-red-600 transition-colors cursor-pointer">
-              <i class="fa-solid fa-heart"></i>
-            </button>  
+            <button (click)="addToFavs()" [ngClass]="{'text-red-500': isFav, 'text-gray-400': !isFav}" class="text-xl hover:text-red-500 transition-colors cursor-pointer" [title]="isFav ? 'Agregado a Favoritos' : 'Agregar a Favoritos'"><i class="fa-solid fa-heart"></i></button>  
           </div>
 
           <div class="sm:items-center sm:gap-4 sm:flex justify-between mt-6 md:mt-8">
             <p class="text-2xl font-extrabold text-[var(--gunmetal)] sm:text-3xl">${{product.price | number:'1.2-2'}}
-              <span class="text-sm font-normal text-[var(--burnt-sienna)] mr-2">-{{product.discountPercentage}}% OFF</span>
+              <span class="text-sm font-medium text-[var(--burnt-sienna)] mr-2">-{{product.discountPercentage}}% OFF</span>
             </p>
 
             <div class="flex items-center justify-end">
-              <span class="text-gray-400 text-sm font-semibold mr-2 cursor-default">({{product.rating}})</span>
+              <span class="text-gray-500 text-base font-medium mr-2">{{product.rating}}</span>
               <div class="flex items-center space-x-1 rtl:space-x-reverse">
                 @for (i of stars; track i) {
                   <i class="text-lg font-hairline ml-1" [ngClass]="rateIcon(product.rating, i)"></i>
                 }
               </div>
-              <a (click)="scrollToReviews($event)" class="text-sm font-medium leading-none text-gray-400 underline ml-2 hover:no-underline cursor-pointer">
+              <a (click)="scrollToReviews($event)" class="text-sm font-normal text-gray-500 no-underline ml-2 hover:underline cursor-pointer">
                 {{ reviewsService.totalReviews$ | async }} Reviews
               </a>
             </div>    
@@ -49,13 +46,13 @@
 
           <div class="mt-4 sm:items-center sm:gap-2 sm:flex flex-wrap">
             <span class="w-full text-xl">{{product.availabilityStatus}}
-              <i class="fa-solid ml-1" [ngClass]="{ 'fa-check-circle text-green-500': product.availabilityStatus === 'In Stock', 'fa-exclamation-triangle text-yellow-400': product.availabilityStatus === 'Low Stock', 'fa-times-circle text-red-500': product.availabilityStatus === 'Out of Stock' }"></i>
+              <i class="fa-solid ml-1" [ngClass]="{ 'fa-check-circle text-green-500': product.availabilityStatus === 'In Stock', 'fa-exclamation-triangle text-yellow-500': product.availabilityStatus === 'Low Stock', 'fa-times-circle text-red-500': product.availabilityStatus === 'Out of Stock' }"></i>
             </span>
             <div class="flex items-center mt-2 space-x-4">
               <label class="text-xl font-bold mr-2" for="quantity-value">Cantidad:</label>
-              <input type="number" id="quantity-value" [min]="1" [max]="product.stock" [(ngModel)]="quantity" [value]="quantity" class="p-2 mr-0 border border-0 rounded text-black font-bold text-sm text-center focus:ring-1 focus:ring-[var(--yinmn-blue)] focus:border-[var(--yinmn-blue)]">
-              <span class="text-lg ml-2">{{quantity > 1 ? 'unidades' : 'unidad'}}</span>
-              <span class=" m-0 text-xs text-gray-500">(+{{ product.stock }} disponibles)</span>
+              <input type="number" id="quantity-value" [min]="1" [max]="product.stock" [(ngModel)]="quantity" [value]="quantity" class="p-2 mr-0 border border-0 rounded text-sm font-medium focus:ring-1 focus:ring-[var(--yinmn-blue)] focus:border-[var(--yinmn-blue)]">
+              <span class="text-lg font-normal ml-2">{{quantity > 1 ? 'unidades' : 'unidad'}}</span>
+              <span class="m-0 text-sm text-gray-500">(+{{ product.stock }} disponibles)</span>
             </div>          
           </div>
 
@@ -70,34 +67,32 @@
           <div class="flex flex-wrap items-center gap-x-6 space-y-3 my-6 md:my-7">
             <p class="w-full text-xl font-bold">Fecha estimada de llegada:</p>
             <span class="text-base text-black mb-0"><i class="fa-solid fa-truck-fast text-gray-400"></i>&nbsp; {{ getShippingText(product.shippingInformation) }}</span>
-            <span class="text-xs text-gray-500 mb-0 ml-1" title="Garantía"><i class="fa-solid fa-shield-halved text-base text-gray-400"></i>&nbsp; ({{ product.warrantyInformation }})</span>
+            <span class="text-sm text-gray-500 mb-0 ml-1" title="Garantía"><i class="fa-solid fa-shield-halved text-gray-400"></i>&nbsp; ({{ product.warrantyInformation }})</span>
           </div>
 
-          <!--! FALTA ESTO -->
-          <div class="sm:gap-4 sm:items-center sm:flex mt-6 sm:mt-8">
-            <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">&#xf09d;&nbsp; Comprar</button>
-            <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" (click)="navService.onAddToCart(product)">&#xf07a;&nbsp; Agregar al carrito</button>
+          <div class="sm:gap-4 sm:items-center sm:flex mt-8 sm:mt-10">
+            <button type="button" class="flex items-center py-2 px-3 text-white text-base rounded transition cursor-pointer bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] border border-[var(--yinmn-blue)]" (click)="onAddToCart(product)">Agregar al carrito &nbsp;&#xf217;</button>
+            <button type="button" class="flex items-center py-2 px-3 text-[var(--gunmetal)] text-base font-medium rounded transition cursor-pointer border border-[var(--yinmn-blue)] text-[var(--yinmn-blue)] bg-white hover:bg-[var(--yinmn-blue)] hover:text-white" (click)="onPurchase(product)">Comprar &nbsp;&#xf09d;</button>
           </div>
         </div>
       </div>
 
       <!-- Reviews -->
-      <div id="reviews-section" class="w-full mt-8">  
-        <button (click)="toggleReviews()" class="flex items-center justify-between w-full p-4 bg-white text-[var(--gunmetal)] border border-[var(--gunmetal)] rounded focus:outline-none cursor-pointer" [ngClass]="showingReviews ? 'rounded-b-none border-b-0' : 'rounded border-b'">
+       <div id="reviews-section" class="w-full mt-8 shadow-md">
+        <button (click)="toggleReviews()" class="flex items-center justify-between w-full p-4 bg-white text-[var(--gunmetal)] border border-[var(--gunmetal)] rounded focus:outline-none cursor-pointer transition-colors duration-300" [ngClass]="showingReviews ? 'rounded-b-none border-b-0' : 'rounded border-b'">
           <span class="text-lg font-bold">Opiniones de este producto ({{ reviewsService.totalReviews$ | async }})</span>
-          <i class="fa-solid fa-angle-down w-4 h-4 transition-transform" [class.rotate-180]="showingReviews"></i>
+          <i class="fa-solid fa-angle-down w-4 h-4 transition-transform duration-300" [class.rotate-180]="showingReviews"></i>
         </button>
-
-        @if (showingReviews) {
-          <div class="px-4 pb-4 pt-0 bg-white rounded-b border border[var(--gunmetal)] border-t-0">
+        <div class="transition-all duration-500 ease-in-out overflow-hidden" [ngClass]="{ 'max-h-0 opacity-0': !showingReviews, 'max-h-[1500px] opacity-100': showingReviews }">
+          <div class="px-4 pb-4 pt-0 bg-white rounded-b border border-[var(--gunmetal)] border-t-0">
             <!-- Form -->
-            <div class="p-4 bg-[var(--light-cyan)] text-[var(--gunmetal)] rounded border border-[var(--yinmn-blue)]" [formGroup]="reviewForm"> 
+            @if(!user) {
+              <span class="text-xs font-semibold text-red-500 opacity-85 cursor-default"><i class="fa-solid fa-triangle-exclamation font-normal mr-2"></i>Accede a tu cuenta para opinar sobre este producto</span>
+            }
+            <div [ngClass]="{ 'opacity-50 select-none pointer-events-none': !user }" class="p-4 bg-[var(--light-cyan)] text-[var(--gunmetal)] rounded border border-[var(--yinmn-blue)]" [formGroup]="reviewForm">
               <label for="message" class="text-base font-medium">Escribe tu opinión:</label>
               <div class="w-full flex items-center justify-between flex-wrap mt-2">
-                <textarea formControlName="comment" rows="2" placeholder="¿Qué opinas de este producto?" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"
-                  class="w-full max-w-[75%] block p-2 text-sm placeholder:text-gray-400 bg-white rounded border border-[var(--gunmetal)] focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                </textarea>
-                
+                <textarea formControlName="comment" rows="2" placeholder="¿Qué opinas de este producto?" oninput="this.style.height='auto'; this.style.height=this.scrollHeight + 'px'" class="w-full max-w-[78%] block p-2 text-base placeholder:text-gray-400 bg-white rounded border border-[var(--gunmetal)] placeholder:text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
                 <div class="flex items-center space-x-3 ml-2">
                   <div class="flex items-center space-x-2 mx-4">
                     @for (s of stars; track s) {
@@ -106,63 +101,42 @@
                       </button>
                     }
                   </div>
-                  <button type="button" (click)="submitReview()" aria-label="Publicar" class="bg-[var(--yinmn-blue)] text-white text-sm py-2 px-4 rounded hover:bg-[var(--yinmn-blue-shadow)] transition duration-100 cursor-pointer"><i class="fa-solid fa-comment-dots"></i></button>
+                  <button type="button" (click)="submitReview()" title="Publicar" class="bg-[var(--yinmn-blue)] text-white text-sm py-2 px-4 rounded hover:bg-[var(--yinmn-blue-shadow)] transition duration-100 cursor-pointer">
+                    <i class="fa-solid fa-share-from-square"></i>
+                  </button>
                 </div>
               </div>
             </div>
-
             <!-- Cards -->
             <div class="space-y-4 mt-4">
-               @for (review of reviewsService.reviews$ | async; track $index) {
+              @for (review of reviewsService.reviews$ | async; track $index) {
                 <div class="relative p-4 bg-[var(--ghost-white)] text-[var(--gunmetal)] border border-[var(--powder-blue)] rounded space-y-2">
                   <div class="flex flex-col">
-                    <h3 class="font-medium"><i class="fa-solid fa-user text-gray-400"></i>&nbsp; {{ review.reviewerName }} 
+                    <h3 class="font-medium text-base">
+                      <i class="fa-solid fa-user text-gray-400"></i>&nbsp; {{ review.reviewerName }}
                       <span class="text-xs text-gray-500 ml-1">{{ isOwnReview(review) ? '(Tú)' : '' }}</span>
                     </h3>
                     <span class="text-xs text-gray-400 mt-1">{{ review.reviewerEmail }}</span>
-                  </div>                  
-                  <span class="absolute top-4 right-4 text-sm text-gray-400">{{ review.date | date:'yyyy-MM-dd' }}</span>
-
-                  <div class="flex items-center space-x-1 rtl:space-x-reverse my-4">
+                  </div>
+                  <span class="absolute top-4 right-4 text-sm text-gray-400">{{ review.date | date:'yyyy-MM-dd' }}</span>            
+                 
+                  <div class="flex items-center space-x-1 rtl:space-x-reverse my-3">
                     @for (i of stars; track i) {
                       <i class="text-sm font-hairline" [ngClass]="rateIcon(review.rating, i)"></i>
                     }
-                    <span class="text-gray-400 text-xs ml-1 cursor-default">({{product.rating}})</span>
+                    <span class="text-gray-400 text-xs ml-1 cursor-default">({{ product.rating }})</span>
                   </div>
-                  <p class="text-[var(--gunmetal)]"><i class="fa-solid fa-comment-dots text-gray-400 text-sm"></i>&nbsp; {{ review.comment }}</p> 
+                  <p class="text-sm font-medium"><i class="fa-solid fa-comment text-gray-400 text-sm"></i>&nbsp; {{ review.comment }}</p>
+
                   @if (isOwnReview(review)) {
-                    <button (click)="deleteReview(review)" class="absolute bottom-2 right-2 text-red-500 hover:text-red-600 text-xs transition duration-200 cursor-pointer">&#xf2ed;</button>
+                    <button (click)="deleteReview(review)" class="absolute bottom-2 right-2 text-red-500 hover:text-red-600 text-xs transition duration-200 cursor-pointer">&#xf1f8;</button>
                   }
-                </div>                
+              </div>
               }
-            </div>           
+            </div>
           </div>
-        }                     
-      </div>
+        </div>        
+      </div>      
     </div>  
   </div>
 }
-
-<!--! PENDIENTES DE ESTE COMPONENTE-->
-<!--
-  * Que agregue al carrito la cantidad que se eliga, porque ahorita aunque se ponga x cantidad solamente agrega '1' en el carrito
-  * Que al intentar escribir una opinión sin haber iniciado sesión avise que debe iniciar sesión, o que esté deshabilitado el form, o algo así aún no estoy seguro
--->
-
-
-<!--! RESUMEN DE LO HECHO HASTA LAS 8 AM DEL 05/10/2025-->
-<!--
-  Funcionalidades implementadas:
-    Listado de productos, detalle de producto, filtros por nombre/categoría/tipo.
-    Carrito: agregar, remover, cantidad, total original y con descuento, simulación de compra.
-    Favoritos: agregar/quitar, guardar en localStorage, reflejar estado en botones.
-    Opiniones: agregar comentario y rating con estrellas, mostrar opiniones propias y de otros, eliminar solo las propias, guardar en localStorage.
-    Control de sesión: login, logout, perfil protegido.
-    Mensajes de UI: botón “agregado al carrito”, deshabilitado si ya está en el carrito.
-    LocalStorage usado para persistencia de carrito, favoritos y reviews.
-
-  Pendiente: (ESTO YA DEPENDE DE MI, ESTO FUE LO GENERADO)
-    Perfil: mostrar info del usuario (sin datos bancarios).
-    Wishlist avanzado o historial (opcional).
-    Pulido de UI/UX: estilos, scroll automático en opiniones, botones de “ir al carrito” desde favoritos, etc.
--->

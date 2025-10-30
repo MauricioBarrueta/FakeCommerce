@@ -8,116 +8,109 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class CartService {
 
-  private cartItemsSubject = new BehaviorSubject<ProductsData[]>([]);
-  cartItems$ = this.cartItemsSubject.asObservable();
+  /* Almacena el estado del Carrito */
+  private cartItemsSubject = new BehaviorSubject<ProductsData[]>([])
+  cartItems$ = this.cartItemsSubject.asObservable()
 
   constructor(@Inject(PLATFORM_ID) private platformId: object) {
-    // Cargar carrito desde localStorage si existe
+    /* Se recuperan los productos guardados en el carrito y se actualiza el estado del BehaviorSubject */
     if (isPlatformBrowser(this.platformId)) {
-      const savedCart = localStorage.getItem('cart');
+      const savedCart = localStorage.getItem('cart')
       if (savedCart) {
-        this.cartItemsSubject.next(JSON.parse(savedCart));
+        this.cartItemsSubject.next(JSON.parse(savedCart))
       }
     }
   }
 
+  /* Guarda el contenido del Carrito en localStorage */
   private saveCart() {
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('cart', JSON.stringify(this.cartItemsSubject.value));
+      localStorage.setItem('cart', JSON.stringify(this.cartItemsSubject.value))
     }
   }
 
-  addToCart(product: ProductsData): Observable<ProductsData[]> {
-    const items = [...this.cartItemsSubject.value, product];
-    this.cartItemsSubject.next(items);
-    this.saveCart();
-    return of(items); // retorna observable
-  }
-
-  // removeFromCart(id: number): Observable<ProductsData[]> {
-  //   const items = this.cartItemsSubject.value.filter(p => p.id !== id);
-  //   this.cartItemsSubject.next(items);
-  //   this.saveCart();
-  //   return of(items); // retorna observable
-  // }
-
+  /* Limpia el Carrito después de haber realizado la compra */
   clearCart(): Observable<ProductsData[]> {
-    this.cartItemsSubject.next([]);
-    this.saveCart();
-    return of([]); // retorna observable vacío
+    this.cartItemsSubject.next([])
+    this.saveCart()
+    /* Retorna un Observable vacío */
+    return of([])
   }
 
-  /* Verifica si el producto ya está agregado en el carrito */
+  /* Verifica mediante el id si el producto ya está agregado en el Carrito o no */
   isInCart(id: number): boolean {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]') as ProductsData[]
     return cart.some(product => product.id === id)
   }
 
+  /* Agrega el producto al Carrito desde Favorites, solamente cuando no se ha agregado */
   addToCartFromFavs(product: ProductsData) {
-    const items = [...this.cartItemsSubject.value];
-    const exists = items.find(p => p.id === product.id);
+    const items = [...this.cartItemsSubject.value]
+    const exists = items.find(p => p.id === product.id)
     if (!exists) {
-      items.push(product);
-      this.cartItemsSubject.next(items);
-      localStorage.setItem('cart', JSON.stringify(items));
+      items.push(product)
+      this.cartItemsSubject.next(items)
+      localStorage.setItem('cart', JSON.stringify(items))
     }
   }
 
-
-
+  /* Actualiza la cantidad de un producto y actualiza su valor en memoria y en localStorage */
   updateQuantity(productId: number, quantity: number) {
-  const updatedCart = this.cartItemsSubject.value.map(p =>
-    p.id === productId ? { ...p, quantity } : p
-  );
-  this.cartItemsSubject.next(updatedCart);
-  localStorage.setItem('cart', JSON.stringify(updatedCart));
-}
-
-removeFromCart(productId: number) {
-  const updatedCart = this.cartItemsSubject.value.filter(p => p.id !== productId);
-  this.cartItemsSubject.next(updatedCart);
-  localStorage.setItem('cart', JSON.stringify(updatedCart));
-}
-
-
-  increaseQuantity(productId: number, maxStock: number) {
-    const items = this.cartItemsSubject.value;
-    const item = items.find(p => p.id === productId);
-    if (!item) return;
-    if ((item.quantity ?? 1) < maxStock) {
-      item.quantity!++;
-      this.cartItemsSubject.next([...items]);
-      this.saveCart();
-    }
+    const updatedCart = this.cartItemsSubject.value.map(p =>
+      p.id === productId ? { ...p, quantity } : p
+    );
+    this.cartItemsSubject.next(updatedCart)
+    localStorage.setItem('cart', JSON.stringify(updatedCart))
   }
 
-  decreaseQuantity(productId: number, isCart: boolean = false) {
-    let items = this.cartItemsSubject.value;
-    const item = items.find(p => p.id === productId);
-    if (!item) return;
+  /* Agrega el producto seleccionado al Carrito */
+  addToCart(product: ProductsData) {
+    const items = [...this.cartItemsSubject.value]
 
-    if ((item.quantity ?? 1) > 1) {
-      item.quantity!--;
-    } else if (isCart) {
-      // eliminar solo si estamos en /cart
-      items = items.filter(p => p.id !== productId);
-    } else {
-      item.quantity = 1;
-    }
+    /* Verifica si ya existe el producto o no, si existe: suma la cantidad, si no: agrega el producto */
+    const index = items.findIndex(p => p.id === product.id)
+    index > -1 ? items[index].quantity! += product.quantity! : items.push(product) 
 
-    this.cartItemsSubject.next([...items]);
+    /* Actualiza la memoria y localStorage */
+    this.cartItemsSubject.next(items)
+    localStorage.setItem('cart', JSON.stringify(items))
+  }
+
+  /* Elimina el producto del Carrito */
+  removeFromCart(productId: number) {
+    const items = this.cartItemsSubject.value.filter(p => p.id !== productId);
+    this.cartItemsSubject.next(items);
     this.saveCart();
   }
 
+  /* Incrementa o disminuye la cantidad del producto de acuerdo a su id */
+  increaseQuantity(id: number) {
+    /* Clona el producto para posteriormente actualizarlo */
+    const items = [...this.cartItemsSubject.value]
+    const item = items.find(p => p.id === id)
+    if (item) {
+      item.quantity = (item.quantity || 1) + 1
+      this.cartItemsSubject.next(items)
+      this.saveCart()
+    }
+  }
 
+  decreaseQuantity(id: number) {
+    /* Clona el producto para posteriormente actualizarlo */
+    const items = [...this.cartItemsSubject.value]
+    const item = items.find(p => p.id === id)
+    
+    if (item) {
+      /* Disminuye la cantidad si esta es > 1 o borra el producto del carrito si esta es = 0 */
+      if (item.quantity! > 1) {
+        item.quantity!--
+      } else {
+        const index = items.indexOf(item)
+        items.splice(index, 1)
+      }
 
-
-
-
-
-
-
-
-
-
+      this.cartItemsSubject.next(items)
+      this.saveCart()
+    }
+  }
 }

@@ -1,33 +1,29 @@
-<header class="bg-[var(--gunmetal)] text-white px-6 py-4 flex justify-between items-center">
-  <!--! LOGO (ESTE SE CAMBIA) -->
-  <div class="flex items-center space-x-2">
-    <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-      <span class="text-white font-bold">FK</span>
-    </div>
-    <span class="font-bold text-lg">FakeCommerce.com</span>
+<header class="bg-[var(--gunmetal)] text-white px-6 py-4 flex justify-between items-center cursor-default">
+  <div class="flex items-center space-x-2 px-3 bg-white border-2 border-[var(--yinmn-blue)] rounded">
+    <img src="/header-img.webp" alt="FakeCommerce.com" class="h-10 w-full object-cover border-0" />
   </div>
 
-  <div class="flex items-center justify-end space-x-10">
+  <div class="flex items-center justify-end space-x-12">
     <nav class="flex items-center space-x-2">
-      <a class="mr-2 bg-[var(--yinmn-blue)] px-4 py-2 rounded" [routerLink]="['/products']">&#xf54e;&nbsp; Productos</a>
-      <a class="relative mr-2 bg-[var(--yinmn-blue)] px-4 py-2 rounded" [routerLink]="['/cart']">&#xf07a;&nbsp; Carrito
+      <a class="mr-2 bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] px-4 py-2 rounded border border-[var(--yinmn-blue)] transition" [routerLink]="['/products']">&#xf54e;&nbsp; Productos</a>
+      <a class="relative mr-2 bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] px-4 py-2 rounded border border-[var(--yinmn-blue)] transition" [routerLink]="['/cart']">&#xf07a;&nbsp; Carrito
         @if (cartCounter > 0) {
           <span class="w-5 h-5 flex items-center justify-center absolute -top-2 -right-1 bg-[var(--burnt-sienna)] text-white text-xs rounded">{{ cartDisplay }}</span>
         }
       </a>
-      <a class="mr-2 bg-[var(--yinmn-blue)] px-4 py-2 rounded" [routerLink]="['/purchases']">&#xf290;&nbsp; Mis compras</a>
-      <a class="relative bg-[var(--yinmn-blue)] px-4 py-2 rounded" [routerLink]="['/favorites']">&#xf004;&nbsp; Favoritos
+      <a class="mr-2 bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] px-4 py-2 rounded border border-[var(--yinmn-blue)] transition" [routerLink]="['/purchases']">&#xf290;&nbsp; Mis compras</a>
+      <a class="relative bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] px-4 py-2 rounded border border-[var(--yinmn-blue)] transition" [routerLink]="['/favorites']">&#xf004;&nbsp; Favoritos
         @if (favsCounter > 0) {
           <span class="w-5 h-5 flex items-center justify-center absolute -top-2 -right-1 bg-[var(--burnt-sienna)] text-white text-xs rounded">{{ favsDisplay }}</span>
         }
       </a>
     </nav>
 
-    <div class="flex items-center space-x-4">
+    <div class="flex items-center space-x-5">
       @if (user) {
         <div class="flex flex-col items-center justify-center">
           <span class="text-sm font-bold cursor-default"><i class="fa-solid fa-user"></i> {{ user.firstName }} {{ user.lastName }}</span>
-          <a (click)="navService.getProfileDetails(user.id)" class="text-xs cursor-pointer">Mi perfil &nbsp;&#xf105;</a>
+          <a (click)="navService.getProfileDetails(user.username)" class="text-xs cursor-pointer hover:underline">Mi perfil&nbsp;<i class="fa-solid fa-angle-right no-underline"></i></a>
         </div>
         <button (click)="logOut()" class="bg-[var(--burnt-sienna)] hover:bg-[var(--burnt-sienna-shadow)] text-sm p-2 rounded cursor-pointer transition duration-100">Salir &nbsp;&#xf2f5;</button>
       } @else {
@@ -39,5 +35,3 @@
     </div>
   </div>  
 </header>
-
-

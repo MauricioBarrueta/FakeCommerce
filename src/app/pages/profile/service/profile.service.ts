@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, of, throwError } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { ProfileInterface } from '../interface/profile.interface';
 import { environment } from '../../../../environments/environment.development';
 
@@ -10,16 +10,11 @@ import { environment } from '../../../../environments/environment.development';
 export class ProfileService {
 
   constructor(private http: HttpClient) {}
-
-  //! REGRESAR A COMO ANTES
-  /* Se listan x cantidad de productos */
-    getLoggedUserInfo(id: number): Observable<ProfileInterface> {
-      return this.http.get<ProfileInterface>(`${environment.url}/users/${id}`)
-      // return this.http.get<ProfileInterface>(`${environment.url}/auth/me`)         
-    }  
-
-
-
-
   
+  getUserByUsername(username: string): Observable<ProfileInterface | null> {
+    return this.http.get<{ users: ProfileInterface[] }>(`${environment.url}/users/search?q=${username}`)
+      .pipe(
+        map(response => response.users.length > 0 ? response.users[0] : null)
+      );
+  }
 }

@@ -3,14 +3,14 @@
 
     <div class="flex items-center gap-2">  
       <i class="fa-solid fa-list-ol font-normal mr-1"></i>
-      <input id="list-limit" type="number" min="0" max="50" [(ngModel)]="limit" (ngModelChange)="byLimit(limit)" class="px-4 py-2 rounded font-semibold text-sm bg-white border border-[var(--powder-blue)] focus:ring-1 focus:ring-[var(--powder-blue)] no-spinner">
+      <input id="list-limit" type="number" min="10" max="200" [(ngModel)]="limit" (ngModelChange)="byLimit(limit)" class="px-4 py-2 rounded font-medium text-sm bg-white border border-[var(--powder-blue)] focus:ring-1 focus:ring-[var(--powder-blue)] no-spinner">
       <label for="list-limit" class="text-base">por página</label>
     </div>
 
     <div class="flex items-center gap-2 flex-wrap">
       <div class="relative z-0 group">
-        <input type="text" name="floating-type" id="floating-type" [formControl]="byTypeControl" class="w-40 h-[42px] block py-2.5 px-2 text-sm font-semibold capitalize bg-white border border-[var(--powder-blue)] rounded appearance-none focus:outline-none focus:ring-1 focus:ring-[var(--yinmn-blue)] peer placeholder-transparent" placeholder="Por tipo (Ej: Phone)" required/>
-        <label for="floating-type" class="absolute left-2 top-2.5 text-gray-400 text-sm duration-300 transform origin-[0] peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-[28px] peer-focus:scale-80 peer-focus:text-gray-500 peer-focus:bg-transparent bg-white px-1">Por tipo (Ej: Phone)</label>
+        <input type="text" name="floating-type" id="floating-type" [formControl]="byTypeControl" class="w-40 h-[42px] block py-2.5 px-2 text-sm font-medium capitalize bg-white border border-[var(--powder-blue)] rounded appearance-none focus:outline-none focus:ring-1 focus:ring-[var(--yinmn-blue)] peer placeholder-transparent" placeholder="Por tipo (Ej: Phone)" required/>
+        <label for="floating-type" class="absolute left-2 top-2.5 text-gray-400 text-sm duration-300 transform origin-[0] peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-[28px] peer-focus:scale-80 peer-focus:text-gray-500 peer-focus:bg-transparent bg-white px-1 cursor-text">Por tipo (Ej: Phone)</label>
       </div>
       <i class="fa-solid fa-sliders mx-2" title="Filtrar resultados"></i>
       <select id="p-categories" class="w-40 h-[42px] block py-2.5 px-2 border border-[var(--powder-blue)] text-sm text-gray-400 rounded bg-white focus:ring-[var(--yinmn-blue)] cursor-pointer transition duration-200">
@@ -22,7 +22,7 @@
     </div>
 
     <div class="flex items-center gap-2 justify-start md:justify-end">
-      <i class="fa-solid fa-sort mr-1" title="Ordenar"></i>
+      <i class="fa-solid fa-sort mr-1" title="Orden"></i>
       <button (click)="sortBy()" class="flex items-center gap-1 p-2 text-white text-base rounded transition cursor-pointer bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)]" [title]="isSortAsc ? 'Ascendente' : 'Descendente'">
         <i [ngClass]="isSortAsc ? 'fa-solid fa-arrow-up-a-z' : 'fa-solid fa-arrow-down-z-a'"></i>
       </button>

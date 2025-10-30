@@ -11,7 +11,6 @@ import { FavoritesService } from '../pages/favorites/service/favorites.service';
   selector: 'app-header',
   imports: [CommonModule, RouterLink],
   templateUrl: './header.html',
-  styleUrl: './header.scss'
 })
 export class Header {
 
@@ -20,22 +19,23 @@ export class Header {
   favsCounter: number = 0
 
   constructor(private authService: AuthService, private cartService: CartService, private favService: FavoritesService, public navService: NavService, private router: Router) {
-    // Suscribirse al BehaviorSubject para cambios en tiempo real
+
+    /* Se suscribe a los Observables de Profile, Cart y Favorites para obtener los cambios en tiempo real */
     this.authService.user$.subscribe((u) => (this.user = u))
 
-    // Suscribirse a carrito
-  this.cartService.cartItems$.subscribe(products => {
-    const total = products.reduce((acc, p) => acc + (p.quantity ?? 1), 0);
-    this.cartCounter = total > 9 ? 9 : total;
-  });
+    /* Se obtiene la cantidad de productos agregados en Cart y Favorites, actializando la cantidad en tiempo real */
+    this.cartService.cartItems$.subscribe(products => {
+      const total = products.reduce((acc, p) => acc + (p.quantity ?? 1), 0)
+      this.cartCounter = total > 9 ? 9 : total
+    });
 
-   this.favService.favorites$.subscribe(favs => {
-    const total = favs.reduce((acc, f) => acc + (f.quantity ?? 1), 0);
-    this.favsCounter = total > 9 ? 9 : total;
-  });
+    this.favService.favorites$.subscribe(favs => {
+      const total = favs.reduce((acc, f) => acc + (f.quantity ?? 1), 0)
+      this.favsCounter = total > 9 ? 9 : total
+    });
   }
   
-  /* Se cierra la sesión, redirige a /products si la ruta actual está protegida */
+  /* Se cierra la sesión, redirige a /products si la ruta actual está protegida por AuthGuard */
   logOut() {
     this.authService.logOut()
     const currPath = this.router.url
@@ -44,15 +44,12 @@ export class Header {
     }
   }
 
+  /* Se muestra la cantidad de productos agregados en Cart y Favorites, si es > 9 mostrará '+9' */
   get cartDisplay() {
-  return this.cartCounter >= 9 ? '+9' : this.cartCounter;
-}
+    return this.cartCounter >= 9 ? '+9' : this.cartCounter
+  }
 
-get favsDisplay() {
-  return this.favsCounter >= 9 ? '+9' : this.favsCounter
-}
-
-  
-
-
+  get favsDisplay() {
+    return this.favsCounter >= 9 ? '+9' : this.favsCounter
+  }
 }
