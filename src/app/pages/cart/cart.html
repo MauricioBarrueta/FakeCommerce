@@ -1,64 +1,72 @@
 <section class="py-8 md:py-16">
   <div class="max-w-screen-xl px-4 mx-auto 2xl:px-0">
-    <h2 class="text-2xl font-semibold text-[var(--gunmetal)]">Tu carrito de compras:</h2>  
+    <h2 class="text-2xl max-md:text-xl font-semibold text-[var(--gunmetal)]">Tu carrito de compras:</h2>  
 
     <div class="mt-4 sm:mt-6 md:gap-6 lg:flex lg:items-start xl:gap-8">
-      <!-- Card -->
-      <div class="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
+      <div class="mx-auto w-full max-w-4xl flex-none max-xl:max-w-2xl max-lg:max-w-full">
         @if(isCartEmpty){
-          <span class="text-sm font-semibold text-red-500 opacity-65 cursor-default">Tu carrito está vacío, agrega productos y comienza a comprar<i class="fa-solid fa-cash-register font-normal ml-2"></i></span>
+          <span class="flex items-center flex-wrap gap-1 text-lg max-lg:text-base max-sm:text-sm font-medium text-[var(--burnt-sienna)] cursor-default">
+            Tu carrito está vacío <i class="fa-solid fa-cart-shopping"></i>, agrega <a [routerLink]="['/products']" class="font-semibold hover:underline">productos</a> y comienza a comprar
+          </span>
         }
 
+        <!-- Card -->
         <div class="space-y-6">
           @for (item of cartProducts$ | async; track item.id) {
             <div class="rounded border border-[var(--gunmetal)] bg-white text-[var(--gunmetal)] p-4 shadow-md cursor-default">
-              <div class="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
-                <a (click)="navService.getProductDetails(item.id)" class="shrink-0 md:order-1 cursor-pointer">
-                  <img class="h-24 w-24 scale-95 hover:scale-100 transition duration-200 linear drop-shadow-md" [src]="item.images[0]" [alt]="item.title">
+              <div class="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0 max-md:flex-col max-md:gap-y-4">
+                <a (click)="navService.getProductDetails(item.id)" class="shrink-0 md:order-1 cursor-pointer max-md:order-1">
+                  <img class="h-32 w-32 scale-95 hover:scale-100 transition duration-200 linear drop-shadow-md max-md:mx-auto" [src]="item.images[0]" [alt]="item.title">
                 </a>
 
-                <div class="flex justify-center items-baseline md:order-3 py-4">
+                <div class="w-full min-w-0 flex-1 space-y-4 md:order-2 max-md:order-3 ">
+                  <p class="text-xl font-bold mb-0 max-xl:text-lg">{{ item.title }}</p>
+                  <p class="mb-0 mt-2">{{ item.description }}</p>
+                </div>
+
+                <div class="flex justify-center items-baseline md:order-3 py-4 ml-2 max-md:ml-0 max-md:order-2 max-md:self-start max-md:w-full max-md:justify-around max-md:items-baseline max-md:flex-row-reverse">
                   <div class="flex flex-col items-center">
                     <div class="flex items-center space-x-3">
-                      <button (click)="decreaseQuantity(item)" class="px-2 py-1 mr-0 rounded text-white font-medium bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] transition duration-200 cursor-pointer">−</button>
-                      <input type="number" [max]="item.stock" [min]="1" [value]="item.quantity ?? 1" id="counter-input" data-input-counter class="w-10 border-0 bg-transparent text-center text-sm font-medium focus:outline-none focus:ring-0 no-spinner">
-                      <button (click)="increaseQuantity(item)" class="px-2 py-1 rounded text-white font-medium bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] transition duration-200 cursor-pointer">+</button>
+                      <button (click)="decreaseQuantity(item)" class="w-[26px] h-[38px] px-2 py-1 mr-0 rounded text-white font-semibold bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] rounded-r-none transition duration-200 cursor-pointer">-</button>
+                      <input type="number" [max]="item.stock" [min]="1" [value]="item.quantity ?? 1" id="counter-input" data-input-counter class="w-10 h-[38px] border border-[var(--powder-blue)] border-r-0 border-l-0 bg-transparent text-center text-sm font-medium focus:outline-none focus:ring-0 no-spinner">
+                      <button (click)="increaseQuantity(item)" class="w-[26px] h-[38px] px-2 py-1 rounded text-white font-medium bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] rounded-l-none transition duration-200 cursor-pointer">+</button>
                     </div>
-                    <span class="text-xs text-gray-400 mt-3">(+{{item.stock}} disponibles)</span>
-                  </div>  
-                  <div class="ml-4 text-center">
-                    <p class="text-lg font-bold">${{ item.price | number:'1.2-2' }} <span class="text-sm font-medium text-[var(--burnt-sienna)] ml-1">-{{ item.discountPercentage }}%</span>
-                    </p>
+                    <span class="text-xs text-gray-400 mt-3">(+{{ item.stock }} disponibles)</span>
                   </div>
-                </div>    
 
-                <div class="w-full min-w-0 max-w-[485px] flex-1 space-y-4 md:order-2">
-                  <p class="text-xl font-bold mb-0">{{item.title}}</p>
-                  <p class="mb-0 mt-2">{{item.description}}</p>            
-                  <button type="button" (click)="confirmDelete(item.id)" class="text-sm text-red-500 hover:text-red-600 mt-4 transition duration-200 cursor-pointer"><i class="fa-solid fa-trash"></i>&nbsp; Eliminar</button>
+                  <div class="ml-6 text-center flex items-center justify-center max-xl:flex-col max-lg:flex-row max-md:ml-0">
+                    <p class="text-lg font-bold">${{ item.price | number:'1.2-2' }}</p>
+                    <span class="text-sm font-medium text-[var(--burnt-sienna)] ml-2 max-xl:ml-0 max-lg:ml-2 ">-{{ item.discountPercentage | number:'1.2-2'}}%</span>
+                  </div>
                 </div>
               </div>
+
+              <button type="button" (click)="removeFromCart(item.id)" class="w-full text-sm text-right max-md:text-left text-red-500 hover:text-red-600 mt-2 transition duration-200 cursor-pointer max-md:text-xs max-md:mt-0"><i class="fa-solid fa-trash"></i>&nbsp; Eliminar</button>
             </div>
           }                   
         </div>
       </div>
-      <!-- Precio -->
+      
+      <!-- Resumen -->
       <div class="mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full">
         <div class="space-y-4 rounded border border-[var(--gunmetal)] bg-white text-[var(--gunmetal)] p-4 shadow-md cursor-default">
           <p class="text-xl font-bold">Resumen de compra:</p>
           <div class="space-y-4">
-
             <div class="space-y-2">
               <dl class="flex items-center justify-between gap-4 py-2 px-1">
-                <dt class="text-base font-normal"><i class="fa-solid fa-tag text-gray-400"></i>&nbsp; Precio original:</dt>
+                <dt class="text-base font-medium text-gray-500"><i class="fa-solid fa-hashtag text-gray-400"></i>&nbsp; Productos:</dt>
+                <dd class="text-base font-medium">{{ totalProducts }}</dd>
+              </dl>
+              <dl class="flex items-center justify-between gap-4 py-2 px-1">
+                <dt class="text-base font-medium text-gray-500"><i class="fa-solid fa-tag text-gray-400"></i>&nbsp; Precio original:</dt>
                 <dd class="text-base font-medium">${{origTotal$ | async | number:'1.2-2'}}</dd>
               </dl>
               <dl class="flex items-center justify-between gap-4 py-2 px-1">
-                <dt class="text-base font-normal"><i class="fa-solid fa-percent text-gray-400"></i>&nbsp; Descuento:</dt>
+                <dt class="text-base font-medium text-gray-500"><i class="fa-solid fa-percent text-gray-400"></i>&nbsp; Descuento:</dt>
                 <dd class="text-base font-medium text-[var(--burnt-sienna)]">-${{totalSaved$ | async | number:'1.2-2'}}</dd>
               </dl>
               <dl class="flex items-center justify-between gap-4 py-2 px-1">
-                <dt class="text-base font-normal"><i class="fa-solid fa-truck-fast text-gray-400"></i>&nbsp; Envío:</dt>
+                <dt class="text-base font-medium text-gray-500"><i class="fa-solid fa-truck-fast text-gray-400"></i>&nbsp; Envío:</dt>
                 <dd class="text-base font-medium text-[var(--burnt-sienna)]">Gratis</dd>
               </dl>
             </div>
@@ -77,8 +85,3 @@
     </div>
   </div>
 </section>
- 
-<!--! PENDIENTES DE ESTE COMPONENTE -->
-<!--
-  * Falta revisar y comentar cart.service
--->

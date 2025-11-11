@@ -6,6 +6,7 @@ import { CartService } from '../shared/service/cart.service';
 import { NavService } from '../shared/service/navigation.service';
 import { ProfileInterface } from '../pages/profile/interface/profile.interface';
 import { FavoritesService } from '../pages/favorites/service/favorites.service';
+import { ModalHandler } from '../shared/service/modal-handler';
 
 @Component({
   selector: 'app-header',
@@ -18,7 +19,7 @@ export class Header {
   cartCounter: number = 0
   favsCounter: number = 0
 
-  constructor(private authService: AuthService, private cartService: CartService, private favService: FavoritesService, public navService: NavService, private router: Router) {
+  constructor(private authService: AuthService, private cartService: CartService, private favService: FavoritesService, public navService: NavService, private router: Router, private modalHandler: ModalHandler) {
 
     /* Se suscribe a los Observables de Profile, Cart y Favorites para obtener los cambios en tiempo real */
     this.authService.user$.subscribe((u) => (this.user = u))
@@ -34,22 +35,31 @@ export class Header {
       this.favsCounter = total > 9 ? 9 : total
     });
   }
+
+  /* Guarda la ruta actual, redirige a /login y regresa a la url anterior una vez iniciada la sesión */
+  logIn() {
+    const currentUrl = this.router.url
+    this.router.navigate(['/login'], { queryParams: { returnUrl: currentUrl } })
+  }
   
   /* Se cierra la sesión, redirige a /products si la ruta actual está protegida por AuthGuard */
   logOut() {
-    this.authService.logOut()
-    const currPath = this.router.url
-    if (currPath.startsWith('/profile') || currPath.startsWith('/cart') || currPath.startsWith('/favorites') || currPath.startsWith('/purchases')) {
-      this.router.navigate(['/products'])
-    }
+    this.modalHandler.confirmModal(`\u{f08b}`, 'Salir de tu cuenta', '¿Estás seguro de que deseas cerrar sesión?', 
+      () => {
+        this.authService.logOut()
+        const currPath = this.router.url
+        if (currPath.startsWith('/profile') || currPath.startsWith('/cart') || currPath.startsWith('/favorites') || currPath.startsWith('/purchases')) {
+          this.router.navigate(['/products'])
+        }
+      })   
   }
 
   /* Se muestra la cantidad de productos agregados en Cart y Favorites, si es > 9 mostrará '+9' */
   get cartDisplay() {
-    return this.cartCounter >= 9 ? '+9' : this.cartCounter
+    return this.cartCounter >= 9 ? '+9' : this.cartCounter    
   }
 
   get favsDisplay() {
-    return this.favsCounter >= 9 ? '+9' : this.favsCounter
+    return this.favsCounter >= 9 ? '+9' : this.favsCounter    
   }
 }

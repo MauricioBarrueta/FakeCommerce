@@ -6,6 +6,6 @@ export interface ModalInterface {
     type?: 'info' | 'warning' | 'error' | 'success' | 'confirm';
     confirmText?: string,
     cancelText?: string,
-    onConfirm: () => void,
+    onConfirm?: () => void,
     onCancel?: () => void,
 }

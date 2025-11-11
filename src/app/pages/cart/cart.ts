@@ -6,7 +6,7 @@ import { ProductsData } from '../products/interface/products.interface';
 import { map, Observable, take } from 'rxjs';
 import { NavService } from '../../shared/service/navigation.service';
 import { PurchaseService } from '../purchases/service/purchase.service';
-import { ModalService } from '../../shared/modal/service/modal.service';
+import { ModalHandler } from '../../shared/service/modal-handler';
 
 @Component({
   selector: 'app-cart',
@@ -16,13 +16,16 @@ import { ModalService } from '../../shared/modal/service/modal.service';
 export class Cart implements OnInit {
 
   cartProducts$!: Observable<ProductsData[]>
+
+  totalProducts: number = 0
+
   origTotal$!: Observable<number>
   totalSaved$!: Observable<number>
   totalDisc$!: Observable<number>
 
   isCartEmpty: boolean = true
 
-  constructor(private cartService: CartService, public navService: NavService, private purchaseService: PurchaseService, private modalService: ModalService) {}
+  constructor(private cartService: CartService, public navService: NavService, private purchaseService: PurchaseService, private modalHandler: ModalHandler) {}
 
   ngOnInit(): void {
     /* Se inicializan los Observables que listan los productos agregados y calculan precios, descuentos y total */
@@ -33,7 +36,9 @@ export class Cart implements OnInit {
 
     /* Controla el estado del botón 'Comprar' dependiendo si Cart esta vacío o no */
     this.cartProducts$.subscribe(items => {
-      this.isCartEmpty = items.length === 0  
+      this.isCartEmpty = items.length === 0     
+      //* Suma el valor de la propiedad 'quantity' de cada productos, si alguno no la tiene definida toma el valor '1' por defecto   
+      this.totalProducts = items.reduce((acc, p) => acc + (p.quantity ?? 1), 0)
     });
   }
 
@@ -43,20 +48,27 @@ export class Cart implements OnInit {
   buyCart() {
     this.cartProducts$
       .pipe(take(1))
-      .subscribe(items => { 
-      /* Calcula el total del carrito sumando (precio * cantidad) de cada producto */
-      const total = items.reduce((acc, p) => acc + (p.price * (p.quantity ?? 1)), 0)
+      .subscribe(items => {
+        /* Calcula el total del carrito sumando (precio * cantidad) de cada producto y el total descontado */
+        const total = items.reduce((acc, p) => acc + (p.price * (p.quantity ?? 1)), 0)
+        const saved = items.reduce((acc, p) => acc + ((this.getOriginalPrice(p) - p.price) * (p.quantity ?? 1)), 0)
+        /* Da formato a las cantidades agregando las comas ',' */
+        const formattedTotal = total.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        const formattedSaved = saved.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
-      /* Se guarda la compra en localStorage */
-      this.purchaseService.addPurchaseFromCart(items, total)
+        this.modalHandler.confirmModal(
+          '\u{f290}', '¿Encontraste todo lo que buscabas?',
+            `Resumen del pedido:
+            Productos: ${items.length}\u00A0\u00A0|\u00A0 Ahorras: $${formattedSaved}\u00A0\u00A0|\u00A0 Total a pagar: $${formattedTotal}
 
-      /* Se limpia todo el Cart después de realizar la compra */
-      this.cartService.clearCart()
-
-      /* Se muestra la ventana emergente con el resumen de la compra */
-      this.alertModal(`\u{f290}`, 'Compra finalizada', 
-        `Productos: ${items.length}\u00A0\u00A0\u00A0\u00A0 Ahorraste: $${items.reduce((acc, p) => acc + ((this.getOriginalPrice(p) - p.price) * (p.quantity ?? 1)), 0).toFixed(2)}\u00A0\u00A0\u00A0\u00A0 Pagaste: $${total}` )
-    });
+            Finaliza tu compra para recibir tus productos`,
+            () => {
+              /* Se guarda la compra y limpia el carrito */
+              this.purchaseService.addPurchaseFromCart(items, total)
+              this.cartService.clearCart()
+            }
+        );
+      })
   }
 
   /* Se calcula el total sin el descuento % */
@@ -98,7 +110,7 @@ export class Cart implements OnInit {
 
   /* Para eliminar el producto seleccionado de la lista */
   removeFromCart(id: number) {
-    this.cartService.removeFromCart(id)
+    this.modalHandler.confirmModal(`\u{2753}`, 'Quitar producto', '¿Estás seguro que deseas eliminar este producto de tu carrito?', () => this.cartService.removeFromCart(id))
   }
 
   /* Incrementa o disminuye la cantidad del producto seleccionado, actualizando también las cantidades $ */
@@ -116,35 +128,8 @@ export class Cart implements OnInit {
         const updatedProduct = items.find(p => p.id === product.id)
         const quantity = updatedProduct?.quantity ?? 0
         if (quantity < 1) {
-          this.alertModal(`\u{f829}`, 'Eliminado del carrito', 'El producto se borró correctamente')
+          this.modalHandler.alertModal(`\u{f829}`, 'Eliminado del carrito', 'El producto se borró correctamente')
         }
       });
-  }
-
-  /* Muestra una ventana emergente como alert, el texto cambia de acuerdo a dónde se requiera el alert */
-  alertModal(icon: string, title: string, text: string) {
-    this.modalService.showModal({
-      icon: icon,
-      title: title,
-      text: text,
-      isAlert: true, 
-      type: 'info', 
-      confirmText: 'Entendido',  
-      onConfirm: () => console.log('Close')
-    });
-  }
-
-  /* Muestra una ventana de confirmación previo a eliminar un producto del carrito */
-  confirmDelete(id: number) {
-    this.modalService.showModal({
-      icon: `\u{2753}`,
-      title: 'Quitar producto',
-      text: '¿Estás seguro que deseas eliminar este producto de tu carrito?',
-      isAlert: false,
-      type: 'confirm',
-      confirmText: 'Confirmar',
-      cancelText: 'Cancelar',
-      onConfirm: () => this.removeFromCart(id),
-    });
   }
 }

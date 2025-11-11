@@ -8,7 +8,7 @@ import { ModalInterface } from '../interface/modal.interface';
 export class ModalService {
 
   //? Se define como Subject para que se pueda subscribir desde cualquiér componente y para emitir valores con .next()
-  private modalDataSubject = new Subject<ModalInterface>()
+  private modalDataSubject = new Subject<ModalInterface | null>()
   modalData$ = this.modalDataSubject.asObservable()
 
   /* Se cambia el estado del Modal */

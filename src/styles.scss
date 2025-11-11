@@ -3,8 +3,6 @@
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif, FontAwesome; }
 
-//! REVISAR QUE TODO SEA RESPONSIVE, checar eso ya al último
-
 :root {
     --yinmn-blue: #3d5a80; --yinmn-blue-shadow: #5d79a1;
     --powder-blue: #98c1d9; --powder-blue-shadow: #6f98af;
@@ -24,13 +22,15 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif, FontAwesome
 
 /* Borde linear Estrellas */
 .star-outline {
-  -webkit-text-stroke: 1px var(--gunmetal); /* borde negro */
-  -webkit-text-fill-color: #f59e0b; /* amarillo */
+  -webkit-text-stroke: 1px var(--gunmetal); 
+  -webkit-text-fill-color: #f59e0b; 
 }
 
-/* Activar animación solamente 1 vez*/
+/* Activar animación solamente 1 vez */
 .one-time-animation {
    animation-iteration-count: 1;
 }
 
-.txt-shadow-white { text-shadow: 1px 1px 2px rgba(255,255,255,0.9); }
+.txt-shadow-white { text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.9); }
+
+h2 { cursor: default; }

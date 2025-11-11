@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductsService } from '../../shared/service/products.service';
 import { ProductsData } from './interface/products.interface';
-import { map, Observable } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { NavService } from '../../shared/service/navigation.service';
@@ -9,7 +9,8 @@ import { CategoriesInterface } from './interface/categories.interface';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ProductsForm } from './form/form';
 import { CartService } from '../../shared/service/cart.service';
-import { ModalService } from '../../shared/modal/service/modal.service';
+import { ModalHandler } from '../../shared/service/modal-handler';
+
 @Component({
   selector: 'app-products',
   imports: [CommonModule, RouterModule, FormsModule, ProductsForm, ReactiveFormsModule],
@@ -17,66 +18,138 @@ import { ModalService } from '../../shared/modal/service/modal.service';
 })
 export class Products implements OnInit {
   
-  constructor(private productService: ProductsService, private navService: NavService, private cartService: CartService, private router: Router, private modalService: ModalService) {}  
+  constructor(private productService: ProductsService, private navService: NavService, private cartService: CartService, private router: Router, private modalHandler: ModalHandler) {}  
   
   products$!: Observable<ProductsData[]>
   categories$!: Observable<CategoriesInterface[]>
   type: string = ''
   sortBy: string = 'asc'
   isSortAsc: boolean = true
-  // limit: number = 10
+  limit: number = 10
+
+  /* Para controlar los filtros */
+  currCategory: string = ''
+  currType: string = ''
+  currOrder: 'asc' | 'desc' | 'random' | null = null
+  productCountTxt: string = ''
+
   readonly stars = [0, 1, 2, 3, 4]
 
   ngOnInit(): void {
+    this.resetFilters()
     this.getCategories()
-    // this.getFeaturedProducts(10)
     this.filterProductsByType('laptop')
-  }  
+  }
 
   /* Se obtiene la lista de categorías */
   getCategories() {
     this.categories$ = this.productService.getCategories()
   }
 
-  /* Se lista la cantidad de productos de acuerdo al parámetro limit */
-  getFeaturedProducts(limit: number) {
-    if(limit > 0) {
-      this.products$ = this.productService.getFeaturedProducts(limit)
-      .pipe(
-        //* Se agrega la propiedad quantity a cada producto usando 'spread operator'
-        map(res => res.products.map(p => ({ ...p, quantity: 1 })))
-      )
-    } 
-    if(limit > 25) {
-      this.showAlert(`\u{f05a}`, `Mostrando +25 productos`, 'Recuerda que mientras más productos se muestren, la carga podría tardar algunos segundos')
-    }    
-  }
+  /* Lista los productos destacados o aplica el límite según el contexto actual */
+  getFeaturedProducts(limit: number, isRandom: boolean = false) {
+    this.limit = limit
 
-  /* Se filtra la lista de productos de acuerdo al tipo de producto */
-  filterProductsByType(type: string) {
-    this.products$ = this.productService.getProductByType(type)
-      .pipe(
-        map(res => res.products.map(p => ({ ...p, quantity: 1 })))
-      )
-  }
+    /* Limpia todos los filtros si se seleccionó listar de forma aleatoria */
+    if (isRandom) {
+      this.resetFilters()
+      this.sortBy = ''
+      this.isSortAsc = false
+    }
 
-  /* Se filtra la lista de productos de acuerdo a su categoría */
-  filterProductsByCategory(category: string) {
-    this.products$ = this.productService.getProductsByCategory(category.split(' ').join('-'))
-      .pipe(
-        map(res => res.products.map(p => ({ ...p, quantity: 1 })))
-      )
-  }
+    /* Verifica si se seleccionó una categoría o si se ingresó un tipo, si se cumple, detiene la ejecución y filtra de acuerdo a la condición */
+    if (this.currCategory) {
+      this.filterProductsByCategory(this.currCategory)
+      return
+    }
+    if (this.currType) {
+      this.filterProductsByType(this.currType)
+      return
+    }
 
+    /* Verifica si se seleccionó un orden (asc o desc), si se cumple, ordena la lista respetando el límite */
+    if (this.sortBy && !isRandom) {
+      this.products$ = this.productService.sortProducts(this.sortBy, this.limit)
+        .pipe(
+          tap(res => {
+            this.productCountTxt = `Mostrando ${res.products.length} de ${res.total} productos en orden:`
+          }),
+          map(res => res.products.map(p => ({ ...p, quantity: 1 })))
+        );
+        return
+    }
+
+    /* Si no hay ningún filtro se muestran los productos destacados de acuerdo al límite */
+    this.products$ = this.productService.getFeaturedProducts(limit)
+      .pipe(
+        map(res => {
+          this.productCountTxt = `Mostrando ${res.products.length} productos destacados`
+          return res.products.map(p => ({ ...p, quantity: 1 }))
+        })
+      );
+
+    if (limit > 50) {
+      this.modalHandler.alertModal('\u{f05a}', 'Mostrando +50 productos', 'La carga podría tardar unos segundos')
+    }
+  }
+  
   /* Ordena la lista de forma ascendente o descendente, tomando como referencia el nombre del producto */
   sortListByTitle() {
     this.isSortAsc = !this.isSortAsc
     this.sortBy = this.isSortAsc ? 'asc' : 'desc'
-    this.products$ = this.productService.sortProducts(this.sortBy)
+
+    /* Se limpian solamente los filtros */
+    this.currCategory = ''
+    this.currType = ''
+
+    this.products$ = this.productService.sortProducts(this.sortBy, this.limit)
       .pipe(
+        tap(res => {
+          this.productCountTxt = `Mostrando ${res.products.length} productos de ${res.total} en orden:`
+        }),
         map(res => res.products.map(p => ({ ...p, quantity: 1 })))
-      )
-  }  
+      );
+  }
+
+  /* Filtra la lista de acuerdo a la categoría */
+  filterProductsByCategory(category: string) {
+    this.currCategory = category
+    this.currType = ''
+    this.sortBy = ''
+    this.isSortAsc = false;
+
+    this.products$ = this.productService.getProductsByCategory(category.split(' ').join('-'), this.limit, this.sortBy)
+      .pipe(
+        tap(res => {
+          this.productCountTxt = `Mostrando ${res.products.length} de ${res.total} productos de la categoría:`
+        }),
+        map(res => res.products.map(p => ({ ...p, quantity: 1 })))
+      );
+  }
+  
+  /* Filtra la lista de acuerdo al tipo de producto */
+  filterProductsByType(type: string) {
+    this.currType = type
+    this.currCategory = ''
+    this.sortBy = ''
+    this.isSortAsc = false
+    
+    this.products$ = this.productService.getProductByType(type, this.limit, this.sortBy)
+      .pipe(
+        tap(res => {
+          this.productCountTxt = `Mostrando ${res.products.length} de ${res.total} productos del tipo:`
+        }),
+        map(res => res.products.map(p => ({ ...p, quantity: 1 })))
+      );
+  }
+
+  /* Se resetean los valores que filtran los resultados */
+  resetFilters() {
+    this.currCategory = ''
+    this.currType = ''
+    this.productCountTxt = ''
+    this.sortBy = ''
+  }
 
   /* Calcula el precio original del producto antes de aplicar el descuento (originalPrice = precioConDescuento / (1 - (descuento / 100)) */
   getOriginalPrice(product: ProductsData): number {
@@ -122,7 +195,7 @@ export class Products implements OnInit {
   onAddToCart(product: ProductsData) {
     const productToAdd = { ...product, quantity: product.quantity ?? 1 }
     this.navService.onAddToCart(productToAdd)
-    this.showAlert(`\u{f218}`, 'Agregado al carrito', 'El producto se ha añadido correctamente a tu carrito')
+    this.modalHandler.alertModal(`\u{f218}`, 'Agregado al carrito', 'El producto se ha añadido correctamente a tu carrito')
   }  
 
   /* Redirige a /cart para realizar la compra directamente */
@@ -130,18 +203,5 @@ export class Products implements OnInit {
     const productToAdd = { ...product, quantity: product.quantity ?? 1 }
     this.navService.onAddToCart(productToAdd)
     this.router.navigate(['/cart'])
-  }
-  
-  /* Muestra una ventana emergente como alert después de agregar un producto a Cart */
-  showAlert(icon: string, title: string, text: string) {
-    this.modalService.showModal({
-      icon: icon,
-      title: title,
-      text: text,
-      isAlert: true, 
-      type: 'info', 
-      confirmText: 'Entendido',  
-      onConfirm: () => console.log('Close')
-    });
   }
 }

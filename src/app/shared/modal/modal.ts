@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 export class Modal implements OnInit {
 
   isVisible = false
-  mouseEnter = false
+  // mouseEnter = false
 
   /* Para prevenir errores por 'undefined' al inicializar */
   modalData: ModalInterface = {

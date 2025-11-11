@@ -1,32 +1,37 @@
 <div class="w-full bg-[var(--ghost-white)] border border-t-0 border-r-0 border-l-0 border-b-[var(--powder-blue)] text-[var(--gunmetal)] p-4">
-  <div class="flex flex-wrap items-center justify-between">
+  <div class="flex flex-wrap items-center justify-between gap-x-4 max-md:gap-y-4 max-md:flex-col max-md:gap-y-4 max-md:items-center">
 
-    <div class="flex items-center gap-2">  
-      <i class="fa-solid fa-list-ol font-normal mr-1"></i>
-      <input id="list-limit" type="number" min="10" max="200" [(ngModel)]="limit" (ngModelChange)="byLimit(limit)" class="px-4 py-2 rounded font-medium text-sm bg-white border border-[var(--powder-blue)] focus:ring-1 focus:ring-[var(--powder-blue)] no-spinner">
-      <label for="list-limit" class="text-base">por página</label>
+    <div class="flex items-center gap-2 max-md:w-full max-md:justify-center">  
+      <i class="fa-solid fa-list-ol font-normal mr-1 max-md:text-base cursor-help" title="Límite"></i>
+      <input id="list-limit" type="number" min="10" max="200" [(ngModel)]="limit" (ngModelChange)="byLimit(limit)" class="px-4 py-2 rounded font-medium text-sm max-md:text-xs bg-white border border-[var(--powder-blue)] focus:ring-1 focus:ring-[var(--powder-blue)] no-spinner">
+      <label for="list-limit" class="text-sm max-md:text-xs font-medium">por página</label>
     </div>
 
-    <div class="flex items-center gap-2 flex-wrap">
+    <div class="flex items-center gap-2 flex-wrap max-md:w-full max-md:justify-center">
       <div class="relative z-0 group">
-        <input type="text" name="floating-type" id="floating-type" [formControl]="byTypeControl" class="w-40 h-[42px] block py-2.5 px-2 text-sm font-medium capitalize bg-white border border-[var(--powder-blue)] rounded appearance-none focus:outline-none focus:ring-1 focus:ring-[var(--yinmn-blue)] peer placeholder-transparent" placeholder="Por tipo (Ej: Phone)" required/>
-        <label for="floating-type" class="absolute left-2 top-2.5 text-gray-400 text-sm duration-300 transform origin-[0] peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-[28px] peer-focus:scale-80 peer-focus:text-gray-500 peer-focus:bg-transparent bg-white px-1 cursor-text">Por tipo (Ej: Phone)</label>
+        <input type="text" name="floating-type" id="floating-type" [formControl]="byTypeControl" class="w-40 h-10 block py-2.5 px-2 text-sm max-md:text-xs font-medium capitalize bg-white border border-[var(--powder-blue)] rounded appearance-none focus:outline-none focus:ring-1 focus:ring-[var(--yinmn-blue)] peer placeholder-transparent" placeholder="Por tipo (Ej.: Laptop)" required/>
+        <label for="floating-type" class="absolute left-2 top-2.5 text-gray-400 text-sm duration-300 transform origin-[0] peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-[28px] peer-focus:scale-80 peer-focus:text-gray-500 peer-focus:bg-transparent bg-white px-1 cursor-text">Por tipo (Ej.: Laptop)</label>
       </div>
-      <i class="fa-solid fa-sliders mx-2" title="Filtrar resultados"></i>
-      <select id="p-categories" class="w-40 h-[42px] block py-2.5 px-2 border border-[var(--powder-blue)] text-sm text-gray-400 rounded bg-white focus:ring-[var(--yinmn-blue)] cursor-pointer transition duration-200">
-        <option cl value="">Por categoría</option>
-        @for (category of categories$ | async; track $index) {
-          <option class="text-[var(--gunmetal)] cursor-pointer" [value]="category.name" (click)="byCategory(category.name)">{{ category.name }}</option>
-        }
-      </select>
+      <i class="fa-solid fa-sliders mx-2 max-md:text-base cursor-help" title="Filtrar resultados"></i>
+      <div class="relative w-40 group">
+        <select id="p-categories" class="w-full h-10 appearance-none block py-2.5 px-3 border border-[var(--powder-blue)] text-sm text-gray-400 rounded bg-white focus:ring-[var(--yinmn-blue)] cursor-pointer transition duration-200">
+          <option value="">Por categoría</option>
+          @for(category of categories$ | async; track $index) {
+            <option class="text-[var(--gunmetal)] cursor-pointer" [value]="category.name" (click)="byCategory(category.name)">{{ category.name }}</option>
+          }
+        </select>
+        <svg class="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--powder-blue)] transition duration-200 pointer-events-none group-hover:text-[var(--yinmn-blue)]" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.25a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08z" clip-rule="evenodd"/>
+        </svg>
+      </div>
     </div>
 
-    <div class="flex items-center gap-2 justify-start md:justify-end">
-      <i class="fa-solid fa-sort mr-1" title="Orden"></i>
+    <div class="flex items-center gap-2 justify-start max-md:w-full max-md:justify-center">
+      <i class="fa-solid fa-arrows-up-down max-md:text-base cursor-help" title="Orden"></i>
       <button (click)="sortBy()" class="flex items-center gap-1 p-2 text-white text-base rounded transition cursor-pointer bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)]" [title]="isSortAsc ? 'Ascendente' : 'Descendente'">
         <i [ngClass]="isSortAsc ? 'fa-solid fa-arrow-up-a-z' : 'fa-solid fa-arrow-down-z-a'"></i>
       </button>
-      <button (click)="byLimit(limit)" title="Aleatorio" class="flex items-center text-base text-white gap-1 p-2 rounded bg-[var(--gunmetal)] hover:bg-[var(--gunmetal-shadow)] transition cursor-pointer">
+      <button (click)="random()" title="Aleatorio" class="flex items-center text-base text-white gap-1 p-2 rounded bg-[var(--gunmetal)] hover:bg-[var(--gunmetal-shadow)] transition cursor-pointer">
         <i class="fas fa-random"></i>
       </button>
     </div>

@@ -1,46 +1,64 @@
 <section class="py-8 md:py-16">
   <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
-    <h2 class="text-2xl font-semibold text-[var(--gunmetal)]">Tu lista de favoritos:</h2>
+
+    <div class="flex items-center justify-between flex-wrap max-sm:flex-col max-sm:items-start">
+      <h2 class="text-2xl max-md:text-xl font-semibold text-[var(--gunmetal)]">Tu lista de favoritos:</h2>  
+      @if(!isFavsEmpty) {
+        <div class="flex items-center justify-end gap-2 ml-4 text-sm cursor-default max-sm:ml-0 max-sm:w-full max-sm:justify-end max-sm:mt-2">
+          <span class="text-[var(--gunmetal)] font-medium text-base max-md:text-sm">{{ !hideItemsInCart ? 'Ocultar' : 'Mostrar' }} agregados al carrito:</span>    
+          <button type="button" (click)="toggleHideItems()" [attr.aria-pressed]="hideItemsInCart" aria-label="{{ !hideItemsInCart ? 'Ocultar agregados' : 'Mostrar agregados' }}" class="text-gray-400 cursor-pointer hover:text-gray-500 focus:outline-none transition duration-200">
+            <i class="fas" [ngClass]="!hideItemsInCart ? 'fa-eye-slash' : 'fa-eye'" [title]="!hideItemsInCart ? 'Ocultar' : 'Mostrar'"></i>
+          </button>
+        </div>
+      }      
+    </div>
   
     <div class="mt-6 sm:mt-8 md:gap-6 lg:flex lg:items-start xl:gap-8">
-      <!-- Card -->
       <div class="w-full flex-none">
-
         @if(isFavsEmpty){
-          <span class="text-sm font-semibold text-red-500 opacity-65 cursor-default">Tu lista de favoritos está vacía, agrega productos que te gusten y guárdalos para más tarde<i class="fa-solid fa-heart-circle-plus font-normal ml-2"></i></span>
+          <span class="flex items-center flex-wrap gap-1 text-lg max-lg:text-base max-sm:text-sm font-medium text-[var(--burnt-sienna)] cursor-default">
+            Tu lista de favoritos está vacía <i class="fa-solid fa-heart-circle-exclamation"></i>, agrega <a [routerLink]="['/products']" class="font-semibold hover:underline">productos</a> que te gusten y guárdalos para más tarde
+          </span>
         }
+
+        <!-- Card -->
         <div class="space-y-6">
           @for (product of favsList$ | async; track $index) {
-            <div class="rounded border border-[var(--gunmetal)] bg-white text-[var(--gunmetal)] p-4 shadow-md cursor-default">
-              <div class="space-y-4 md:flex md:items-center md:justify-start md:gap-6 md:space-y-0">
-                <a class="shrink-0 md:order-1" (click)="getProductDetails(product.id)">
+            <div class="rounded border border-[var(--gunmetal)] bg-white text-[var(--gunmetal)] p-4 shadow-md cursor-default transition-all duration-300 overflow-hidden"
+              [ngClass]="{ 'opacity-0 scale-95 max-h-0 py-0 px-0 border-0': isInCart(product.id) && hideItemsInCart, 'opacity-100 scale-100 max-h-[500px]': !(isInCart(product.id) && hideItemsInCart) }">
+
+              <div class="space-y-4 md:flex md:items-center md:justify-start md:gap-6 md:space-y-0 max-md:flex-col max-md:gap-y-4">
+                <a class="shrink-0 md:order-1 max-md:order-1 flex justify-center max-md:mb-0" (click)="getProductDetails(product.id)">
                   <img class="h-32 w-32 scale-95 hover:scale-100 transition duration-200 linear cursor-pointer drop-shadow-md" [src]="product.images[0]" [alt]="product.title">
                 </a>
 
-                <div class="flex justify-center items-center md:order-3 py-4">
-                  <div class="ml-6 text-center">
-                    <p class="text-xl font-bold">${{ product.price | number:'1.2-2' }} <span class="text-sm font-medium text-[var(--burnt-sienna)] ml-1">-{{ product.discountPercentage }}%</span></p>
-                    <p class="text-base font-medium text-gray-500 mt-2">
-                      Estado:<span class="ml-2" [ngClass]="product.stock > 0 ? 'text-green-500' : 'text-red-500'">{{ product.stock > 0 ? 'Disponible' : 'Agotado' }}</span>
+                <div class="flex justify-center items-center md:order-3 py-4 px-2 max-md:order-2 max-md:mb-0">
+                  <div class="text-center">
+                    <p class="text-xl max-sm:text-lg font-bold">${{ product.price | number: '1.2-2' }}
+                      <span class="text-sm font-medium text-[var(--burnt-sienna)] ml-1">-{{ product.discountPercentage | number: '1.2-2' }}%</span>
+                    </p>
+                    <p class="text-base font-medium text-gray-500 mt-2 max-md:text-sm">Estado: 
+                      <span class="ml-2" [ngClass]="product.stock > 0 ? 'text-green-500' : 'text-red-500'">{{ product.stock > 0 ? 'Disponible' : 'Agotado' }}</span>
                     </p>
                   </div>
                 </div>
-            
-                <div class="w-full min-w-0 flex-1 space-y-4 md:order-2 cursor-default">
-                  <p class="text-lg font-medium mb-2">{{product.title}}</p>
-                  <p class="text-base">{{product.description}}</p>
-            
-                  <div class="flex items-center gap-4">
-                    <button [disabled]="isInCart(product.id)" (click)="addToCartFromFav(product)" class="rounded text-sm font-medium transition duration-200 flex items-center gap-2"
-                      [ngClass]="isInCart(product.id) ? 'bg-transparent text-gray-500 cursor-default' : 'px-4 py-2 bg-[var(--yinmn-blue)] border border-[var(--yinmn-blue)] text-white hover:bg-[var(--yinmn-blue-shadow)] cursor-pointer'">
-                      <i class="fa-solid" [ngClass]="isInCart(product.id) ? 'fa-square-check text-gray-400' : 'fa-cart-plus'"></i>{{ isInCart(product.id) ? 'Agregado' : 'Agregar al carrito' }}
-                    </button>
+                
+                <div class="w-full min-w-0 flex-1 space-y-4 text-left md:order-2 max-md:order-3 cursor-default">
+                  <p class="text-lg font-medium mb-2">{{ product.title }}</p>
+                  <p class="text-base">{{ product.description }}</p>
+
+                  <div class="flex justify-center md:justify-start items-center gap-4 flex-wrap max-md:mt-4 max-md:gap-6">
+                    <button [disabled]="isInCart(product.id)" (click)="addToCartFromFav(product)" class="rounded text-sm font-medium transition duration-200 flex items-center gap-2 max-md:text-xs" [ngClass]="isInCart(product.id) ? 'bg-transparent text-gray-500 cursor-default' : 'px-4 py-2 bg-[var(--yinmn-blue)] border border-[var(--yinmn-blue)] text-white hover:bg-[var(--yinmn-blue-shadow)] cursor-pointer'">
+                      <i class="fa-solid" [ngClass]="isInCart(product.id) ? 'fa-circle-check text-gray-400' : 'fa-cart-plus'"></i>{{ isInCart(product.id) ? 'Agregado' : 'Agregar al carrito' }}
+                    </button>                    
                     @if (isInCart(product.id)) {
-                      <button [routerLink]="['/cart']" class="flex items-center gap-2 px-4 py-2 rounded border border-[var(--yinmn-blue)] text-[var(--yinmn-blue)] text-sm bg-white hover:bg-[var(--yinmn-blue)] hover:text-white transition duration-200 cursor-pointer">
+                      <button [routerLink]="['/cart']" class="flex items-center gap-2 px-4 py-2 rounded border border-[var(--yinmn-blue)] text-[var(--yinmn-blue)] text-sm bg-white hover:bg-[var(--yinmn-blue)] hover:text-white transition duration-200 cursor-pointer max-md:text-xs">
                         <i class="fa-solid fa-cart-shopping"></i><span>Ver en el carrito</span>
                       </button>
                     }
-                    <button type="button" (click)="confirmDelete(product)" class="text-sm text-red-500 hover:text-red-600 transition duration-200 cursor-pointer flex items-center gap-1"><i class="fa-solid fa-trash"></i>Eliminar</button>
+                    <button type="button" (click)="removeFavorite(product)" class="text-sm text-red-500 hover:text-red-600 transition duration-200 cursor-pointer flex items-center gap-1 max-md:text-xs">
+                      <i class="fa-solid fa-trash"></i>Eliminar
+                    </button>
                   </div>
                 </div>
               </div>

@@ -32,13 +32,17 @@ export class PurchaseService {
   addPurchaseFromCart(cart: ProductsData[], total: number): void {
     if (!isPlatformBrowser(this.platformId)) return
 
+    /* Selecciona un valor aleatorio entre los posibles estados de compra */
+    const statuses = ['Entregado', 'Entregado', 'Entregado', 'Pendiente', 'Enviado', 'Cancelada'] as const //* 'as const' convierte de 'string[]' a 'literal' 
+    const randomStatus = statuses[Math.floor(Math.random() * statuses.length)]
+
     /* Datos de la compra */
     const purchase: PurchaseInterface = {
       id: Date.now(),
       date: new Date().toISOString(),
       items: cart,
       total,
-      status: 'Entregado'
+      status: randomStatus
     };
 
     /* Se agrega la nueva compra y se actualiza en memoria */

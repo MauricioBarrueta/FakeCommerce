@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FavoritesService } from './service/favorites.service';
 import { CartService } from '../../shared/service/cart.service';
 import { RouterModule } from '@angular/router';
-import { ModalService } from '../../shared/modal/service/modal.service';
+import { ModalHandler } from '../../shared/service/modal-handler';
 
 @Component({
   selector: 'app-favorites',
@@ -18,7 +18,9 @@ export class Favorites implements OnInit {
   favsList$!: Observable<ProductsData[]>
   isFavsEmpty: boolean = true
 
-  constructor(private favsService: FavoritesService, private navService: NavService, private cartService: CartService, private modalService: ModalService) {}
+  hideItemsInCart: boolean = false
+
+  constructor(private favsService: FavoritesService, private navService: NavService, private cartService: CartService, private modalHandler: ModalHandler) {}
 
   ngOnInit(): void {
     this.favsList$ = this.favsService.favorites$
@@ -31,7 +33,7 @@ export class Favorites implements OnInit {
 
   /* Se elimina el producto de la lista de Favoritos */
   removeFavorite(product: ProductsData): void {
-    this.favsService.toggleFavorite(product)
+    this.modalHandler.confirmModal(`\u{2753}`, 'Quitar producto', '¿Estás seguro que deseas eliminar este producto de tu lista de favoritos?', () => this.favsService.toggleFavorite(product))
   }
 
   /* Redirecciona a los detalles del producto seleccionado */
@@ -47,33 +49,10 @@ export class Favorites implements OnInit {
   /* Agrega el producto al carrito, cambiando el estado de isInCart automáticamente */
   addToCartFromFav(product: ProductsData) {
     this.cartService.addToCart(product)
-    this.showAlert()
+    this.modalHandler.alertModal(`\u{f218}`, 'Agregado al carrito', 'El producto se ha añadido correctamente a tu carrito')
   }
 
-  /* Muestra un alert al agregar un producto al carrito */
-  showAlert() {
-    this.modalService.showModal({
-      icon: `\u{f218}`,
-      title: 'Agregado al carrito',
-      text: 'El producto se ha añadido correctamente a tu carrito',
-      isAlert: true, 
-      type: 'info', 
-      confirmText: 'Entendido',  
-      onConfirm: () => console.log('Close')
-    });
-  }
-
-  /* Muestra una ventana de confirmación previo a eliminar un producto de la lista */
-  confirmDelete(p: ProductsData) {
-    this.modalService.showModal({
-      icon: `\u{2753}`,
-      title: 'Quitar producto',
-      text: '¿Estás seguro que deseas eliminar este producto de tu lista de favoritos?',
-      isAlert: false,
-      type: 'confirm',
-      confirmText: 'Confirmar',
-      cancelText: 'Cancelar',
-      onConfirm: () => this.removeFavorite(p),
-    });
+  toggleHideItems() {
+    this.hideItemsInCart = !this.hideItemsInCart
   }
 }

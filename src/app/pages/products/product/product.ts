@@ -10,17 +10,17 @@ import { AuthService } from '../../../auth/service/auth.service';
 import { ProfileInterface } from '../../profile/interface/profile.interface';
 import { FavoritesService } from '../../favorites/service/favorites.service';
 import { ReviewsService } from './service/reviews.service';
-import { ModalService } from '../../../shared/modal/service/modal.service';
+import { ModalHandler } from '../../../shared/service/modal-handler';
+import { ImgMagnifier } from '../../../shared/img-magnifier/img-magnifier';
 
 @Component({
   selector: 'app-product',
-  imports: [ CommonModule, FormsModule, ReactiveFormsModule ],
+  imports: [ CommonModule, FormsModule, ReactiveFormsModule, ImgMagnifier ],
   templateUrl: './product.html',
 })
 export class ProductDetail implements OnInit {
   
-  constructor(private productsService: ProductsService, private navService: NavService, private authService: AuthService, public reviewsService: ReviewsService, private favsService: FavoritesService, 
-    private route: ActivatedRoute, private fb: FormBuilder, private router: Router, private modalService: ModalService) {}
+  constructor(private productsService: ProductsService, private navService: NavService, private authService: AuthService, public reviewsService: ReviewsService, private favsService: FavoritesService, private route: ActivatedRoute, private fb: FormBuilder, private router: Router, private modalHandler: ModalHandler) {}
     
   product$!: Observable<ProductsData>
   product!: ProductsData
@@ -118,11 +118,15 @@ export class ProductDetail implements OnInit {
   /* Agrega o quita el producto de Favoritos cambiando su estado en su service y de manera local con isFav */
   addToFavs(): void {
     if (!this.product) return
-    this.favsService.toggleFavorite(this.product)
-    this.isFav = this.favsService.isFavorite(this.product.id)
 
-    if(this.isFav) {
-      this.showAlert(`\u{e4fd}`, 'Agregado a favoritos', 'El producto se ha añadido correctamente')
+    if (this.authService.isUserLogged()) {
+      this.favsService.toggleFavorite(this.product)
+      this.isFav = this.favsService.isFavorite(this.product.id)
+
+      this.isFav ? this.modalHandler.alertModal(`\u{e4fd}`, 'Agregado a favoritos', 'El producto se ha añadido correctamente de tu lista de favoritos')
+        : this.modalHandler.alertModal(`\u{e501}`, 'Eliminado de favoritos', 'El producto se ha borrado correctamente de tu lista de favoritos')
+    } else {
+      this.modalHandler.warningModal(`\u{f071}`, 'Accede a tu cuenta', 'Debes iniciar sesión para poder agregar este producto a favoritos')
     }
   }
 
@@ -143,15 +147,26 @@ export class ProductDetail implements OnInit {
 
   /* Controla y actualiza la calificación seleccionada al hacer clic en una estrella */
   selectRating(rating: number) {
-    this.selectedRating = rating;
-    this.reviewForm.get('rating')?.setValue(rating + 1); //* + 1 ya que stars[] = [0 - 4]
+    this.selectedRating = rating
+    this.reviewForm.get('rating')?.setValue(rating + 1) //* + 1 ya que stars[] = [0 - 4]
   }
 
-  /* Para guardar la opinión del usuario, verifica si el usuario, producto y formulario son validos y resetea los valores al finalizar */
+  /* Para guardar la opinión del usuario, verifica si el usuario, producto y formulario son validos y resetea los valores al finalizar */ 
   submitReview(): void {
-    if (!this.user || !this.product || this.reviewForm.invalid) return
+    if (!this.product) return
     
+    /* Verifica si el usuario ya inició sesión y si el formulario no está vacío */
+    if (!this.user) {
+      this.modalHandler.warningModal('\u{f071}', 'Accede a tu cuenta', 'Debes iniciar sesión para poder opinar sobre este producto')
+      return
+    }
+    if (this.reviewForm.invalid) {
+      this.modalHandler.warningModal('\u{f071}', 'Reseña incompleta', 'Debes escribir un comentario antes de publicar tu reseña sobre este producto.')
+      return
+    }
+
     this.reviewsService.submitReview(this.user, this.product, this.reviewForm.value)
+    this.modalHandler.alertModal('\u{f005}', 'Reseña publicada', 'Tu opinión sobre este producto se publicó correctamente')
     this.reviewForm.reset({ comment: '', rating: 0 })
     this.selectedRating = 0
   }
@@ -165,7 +180,7 @@ export class ProductDetail implements OnInit {
   /* Para borrar de la memoria una opinión, únicamente aplica a las que guardó el usuario */
   deleteReview(review: Review) {
     if (!this.product) return
-    this.reviewsService.deleteReview(this.product, review)
+    this.modalHandler.confirmModal(`\u{2753}`, 'Eliminar reseña', '¿Estás seguro de que quieres eliminar tu opinión sobre este producto? La acción será irreversible', () => this.reviewsService.deleteReview(this.product, review))
   }
 
   /* Agrega el producto al carrito, tomando en cuenta la propiedad 'quantity' (creada localmente, no viene de DummyJSON) y respetando el stock disponible del producto */
@@ -174,7 +189,7 @@ export class ProductDetail implements OnInit {
     //* Se crea un nuevo objeto copiando todas las propiedades de 'product' y agrega/sobrescribe 'quantity'
     const productToAdd = { ...product, quantity: validQ }    
     this.navService.onAddToCart(productToAdd)
-    this.showAlert(`\u{f218}`, 'Agregado al carrito', 'El producto se ha añadido correctamente a tu carrito')
+    this.modalHandler.alertModal(`\u{f218}`, 'Agregado al carrito', 'El producto se ha añadido correctamente a tu carrito')
   }
 
   /* Redirige a /cart para realizar la compra directamente */
@@ -183,18 +198,5 @@ export class ProductDetail implements OnInit {
     const productToAdd = { ...product, quantity: validQ }    
     this.navService.onAddToCart(productToAdd)
     this.router.navigate(['/cart'])
-  }
-
-  /* Muestra la ventana emergene, el texto cambia dependiendo si se agregó a Cart o Favorites */
-  showAlert(icon: string, title: string, text: string) {
-    this.modalService.showModal({
-      icon: icon,
-      title: title,
-      text: text,
-      isAlert: true, 
-      type: 'info', 
-      confirmText: 'Entendido',  
-      onConfirm: () => console.log('Close')
-    });
   }
 }

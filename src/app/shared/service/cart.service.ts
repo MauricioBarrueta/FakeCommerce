@@ -78,9 +78,9 @@ export class CartService {
 
   /* Elimina el producto del Carrito */
   removeFromCart(productId: number) {
-    const items = this.cartItemsSubject.value.filter(p => p.id !== productId);
-    this.cartItemsSubject.next(items);
-    this.saveCart();
+    const items = this.cartItemsSubject.value.filter(p => p.id !== productId)
+    this.cartItemsSubject.next(items)
+    this.saveCart()
   }
 
   /* Incrementa o disminuye la cantidad del producto de acuerdo a su id */

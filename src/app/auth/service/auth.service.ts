@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { isPlatformBrowser } from '@angular/common';
 import { ProductsData } from '../../pages/products/interface/products.interface';
@@ -12,7 +12,7 @@ import { ProfileInterface } from '../../pages/profile/interface/profile.interfac
 export class AuthService {
 
   //? BehaviorSubject es un tipo de Observable que siempre almacena y emite su último valor a todas las suscripciones
-  
+
   /* Almacena el estado del usuario (con sesión iniciada o no iniciada) */
   private currentUserSubject = new BehaviorSubject<ProfileInterface | null>(null)
   user$ = this.currentUserSubject.asObservable()
@@ -35,12 +35,14 @@ export class AuthService {
   logIn(username: string, password: string): Observable<ProfileInterface> {
     return this.http.post<ProfileInterface>(`${environment.url}/auth/login`, { username, password })
       .pipe(
-        tap((user) => {
-          /* Guarda los datos y actualiza el estado del usuario para mantener la sesión iniciada aunque se cierre o recarge la página */
+        tap(user => {
           if (isPlatformBrowser(this.platformId)) {
             localStorage.setItem('user', JSON.stringify(user))
           }
           this.currentUserSubject.next(user)
+        }),
+        catchError(err => {
+          return throwError(() => err)
         })
       );
   }

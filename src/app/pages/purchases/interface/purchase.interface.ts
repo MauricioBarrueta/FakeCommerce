@@ -5,5 +5,5 @@ export interface PurchaseInterface {
     date: string
     items: ProductsData[]
     total: number
-    status: 'Pendiente' | 'Entregado' //'Pendiente' | 'Enviado' | 'Entregado' | 'Cancelado'
+    status: 'Pendiente' | 'Entregado' | 'Enviado' | 'Cancelada'
 }

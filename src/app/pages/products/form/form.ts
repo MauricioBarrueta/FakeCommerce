@@ -21,6 +21,7 @@ export class ProductsForm implements OnInit {
   @Output() filterByType = new EventEmitter<string>()
   @Output() listProducts = new EventEmitter<number>()
   @Output() sortList = new EventEmitter<boolean>()
+  @Output() randomList = new EventEmitter<number>();
 
   byTypeControl = new FormControl('')
 
@@ -31,7 +32,7 @@ export class ProductsForm implements OnInit {
       .subscribe(value => this.filterByType.emit(value ?? '')); //* Se asegura que si el valor es nulo se envíe un valor vacío
   }
 
-  /* Métodos que filtran los resultados de acuerdo a su categoría, límite, tipo, orden */
+  /* Métodos que filtran los resultados de acuerdo a su categoría, límite, tipo y orden */
   byCategory(category: string) { 
     this.filterByCategory.emit(category) 
   }
@@ -47,5 +48,9 @@ export class ProductsForm implements OnInit {
   sortBy() {
     this.isSortAsc = !this.isSortAsc
     this.sortList.emit(this.isSortAsc)
+  }
+
+  random() {
+    this.randomList.emit(this.limit)
   }
 }
