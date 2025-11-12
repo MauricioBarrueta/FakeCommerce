@@ -18,7 +18,6 @@ export class Cart implements OnInit {
   cartProducts$!: Observable<ProductsData[]>
 
   totalProducts: number = 0
-
   origTotal$!: Observable<number>
   totalSaved$!: Observable<number>
   totalDisc$!: Observable<number>
@@ -59,7 +58,7 @@ export class Cart implements OnInit {
         this.modalHandler.confirmModal(
           '\u{f290}', '¿Encontraste todo lo que buscabas?',
             `Resumen del pedido:
-            Productos: ${items.length}\u00A0\u00A0|\u00A0 Ahorras: $${formattedSaved}\u00A0\u00A0|\u00A0 Total a pagar: $${formattedTotal}
+            Productos: ${this.totalProducts}\u00A0\u00A0|\u00A0 Ahorras: $${formattedSaved}\u00A0\u00A0|\u00A0 Total a pagar: $${formattedTotal}
 
             Finaliza tu compra para recibir tus productos`,
             () => {

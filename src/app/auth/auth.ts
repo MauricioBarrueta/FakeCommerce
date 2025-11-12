@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../shared/service/cart.service';
 import { ModalHandler } from '../shared/service/modal-handler';
-import { FavoritesService } from '../pages/favorites/service/favorites.service';
 
 @Component({
   selector: 'app-auth',
@@ -18,7 +17,7 @@ export class Auth {
   password: string = 'michaelwpass'
   showingPass: boolean = false
 
-  constructor(private authService: AuthService, private cartService: CartService, private favsService: FavoritesService, private router: Router, private route: ActivatedRoute, private modalHandler: ModalHandler) {}
+  constructor(private authService: AuthService, private cartService: CartService, private router: Router, private route: ActivatedRoute, private modalHandler: ModalHandler) {}
   
   /* Para iniciar sesión, almacena el producto que se quizo agregar al carrito temporalmente si es que no se había iniciado sesión */
   logIn(event: Event) {
@@ -32,7 +31,6 @@ export class Auth {
           if (pendingToCart) {
             this.cartService.addToCart(pendingToCart)
             this.authService.clearPendingProduct()            
-            this.modalHandler.alertModal(`\u{f218}`, 'Agregado al carrito', 'El producto se ha añadido correctamente a tu carrito')
           }   
           
           /* Redirecciona a la url anterior o a /products por defecto */

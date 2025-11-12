@@ -188,8 +188,13 @@ export class ProductDetail implements OnInit {
     const validQ = Math.min(this.quantity, product.stock)
     //* Se crea un nuevo objeto copiando todas las propiedades de 'product' y agrega/sobrescribe 'quantity'
     const productToAdd = { ...product, quantity: validQ }    
+
+    /* Para verificar si se inició sesión, si se cumple la condición simplemente muestra el alert después de agregar */
+    const isLogged = this.authService.isUserLogged()
+
     this.navService.onAddToCart(productToAdd)
-    this.modalHandler.alertModal(`\u{f218}`, 'Agregado al carrito', 'El producto se ha añadido correctamente a tu carrito')
+
+    if(isLogged) this.modalHandler.alertModal(`\u{f218}`, 'Agregado al carrito', 'El producto se ha añadido correctamente a tu carrito')    
   }
 
   /* Redirige a /cart para realizar la compra directamente */

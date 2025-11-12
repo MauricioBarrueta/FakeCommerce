@@ -32,6 +32,13 @@ export class ProductsForm implements OnInit {
       .subscribe(value => this.filterByType.emit(value ?? '')); //* Se asegura que si el valor es nulo se envíe un valor vacío
   }
 
+  /* Cada que se dispara el onChange del <select> obtiene el valor de la categoría seleccionada y lo pasa al método */
+  onCategoryChange(event: Event) {
+    const select = event.target as HTMLSelectElement
+    const category = select.value
+    this.byCategory(category)
+  }
+
   /* Métodos que filtran los resultados de acuerdo a su categoría, límite, tipo y orden */
   byCategory(category: string) { 
     this.filterByCategory.emit(category) 

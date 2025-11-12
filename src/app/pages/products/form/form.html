@@ -14,10 +14,10 @@
       </div>
       <i class="fa-solid fa-sliders mx-2 max-md:text-base cursor-help" title="Filtrar resultados"></i>
       <div class="relative w-40 group">
-        <select id="p-categories" class="w-full h-10 appearance-none block py-2.5 px-3 border border-[var(--powder-blue)] text-sm text-gray-400 rounded bg-white focus:ring-[var(--yinmn-blue)] cursor-pointer transition duration-200">
-          <option value="">Por categoría</option>
-          @for(category of categories$ | async; track $index) {
-            <option class="text-[var(--gunmetal)] cursor-pointer" [value]="category.name" (click)="byCategory(category.name)">{{ category.name }}</option>
+        <select id="p-categories" class="w-full h-10 appearance-none block py-2.5 px-3 border border-[var(--powder-blue)] text-sm text-gray-400 rounded bg-white focus:ring-[var(--yinmn-blue)] cursor-pointer transition duration-200" (change)="onCategoryChange($event)">
+          <option value="" disabled selected>Por categoría</option>
+          @for (category of categories$ | async; track $index) {
+            <option class="text-[var(--gunmetal)]" [value]="category.name">{{ category.name }}</option>
           }
         </select>
         <svg class="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--powder-blue)] transition duration-200 pointer-events-none group-hover:text-[var(--yinmn-blue)]" fill="currentColor" viewBox="0 0 20 20">

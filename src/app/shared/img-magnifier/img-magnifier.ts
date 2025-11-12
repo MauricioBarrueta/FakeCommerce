@@ -1,4 +1,5 @@
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, PLATFORM_ID, SimpleChanges, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-img-magnifier',
@@ -6,6 +7,8 @@ import { AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, 
   templateUrl: './img-magnifier.html',
 })
 export class ImgMagnifier implements AfterViewInit, OnChanges {
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   @Input() src!: string
   @Input() alt = ''
@@ -18,6 +21,9 @@ export class ImgMagnifier implements AfterViewInit, OnChanges {
   private initialized = false
 
   ngAfterViewInit() {
+    /* Evita la ejecución en SSR */
+    if (!isPlatformBrowser(this.platformId)) return
+
     /* Para evitar que se inicialice en móviles si no tiene los permisos requeridos */
     if (!this.enableOnMobile && window.innerWidth < 768) return
 
