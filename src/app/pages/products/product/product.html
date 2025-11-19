@@ -52,7 +52,7 @@
           <div class="mt-4 sm:items-center sm:gap-2 sm:flex flex-wrap">            
             <div class="flex items-center mt-2 space-x-4 max-lg:flex-wrap">
               <label class="text-xl max-sm:text-lg font-bold mr-2" for="quantity-value">Cantidad:</label>
-              <input type="number" id="quantity-value" [min]="1" [max]="product.stock" [(ngModel)]="quantity" [value]="quantity" class="p-2 mr-0 border border-0 rounded text-md font-medium focus:ring-1 focus:ring-[var(--yinmn-blue)] focus:border-[var(--yinmn-blue)]"/>
+              <input type="number" id="quantity-value" [min]="1" [max]="product.stock" [(ngModel)]="quantity" [value]="quantity" class="p-2 mr-0 border border-0 rounded text-md font-medium focus:ring-1 focus:ring-[var(--yinmn-blue)] focus:border-[var(--yinmn-blue)] disabled:cursor-not-allowed" [disabled]="product.stock === 0" [ngClass]="product.stock === 0 ? 'text-gray-400' : ''"/>
               <span class="text-lg font-normal ml-2">{{ quantity > 1 ? 'unidades' : 'unidad' }}</span>
               <span class="m-0 text-sm text-gray-500">(+{{ product.stock }} disponibles)</span>
               
@@ -90,8 +90,8 @@
           </div>
 
           <div class="gap-4 items-center flex mt-8 sm:mt-10">
-            <button type="button" class="flex items-center py-2 px-3 text-white text-base max-md:text-sm rounded transition cursor-pointer bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] border border-[var(--yinmn-blue)]" (click)="onAddToCart(product)">Agregar al carrito &nbsp;&#xf217;</button>
-            <button type="button" class="flex items-center py-2 px-3 text-[var(--gunmetal)] text-base max-md:text-sm font-medium rounded transition cursor-pointer border border-[var(--yinmn-blue)] text-[var(--yinmn-blue)] bg-white hover:bg-[var(--yinmn-blue)] hover:text-white" (click)="onPurchase(product)">Comprar &nbsp;&#xf09d;</button>
+            <button type="button" class="flex items-center py-2 px-3 text-white text-base max-md:text-sm rounded transition cursor-pointer bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] border border-[var(--yinmn-blue)] disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="product.stock === 0" (click)="onAddToCart(product)">Agregar al carrito &nbsp;&#xf217;</button>
+            <button type="button" class="flex items-center py-2 px-3 text-[var(--gunmetal)] text-base max-md:text-sm font-medium rounded transition cursor-pointer border border-[var(--yinmn-blue)] text-[var(--yinmn-blue)] bg-white hover:bg-[var(--yinmn-blue)] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="product.stock === 0" (click)="onPurchase(product)">Comprar &nbsp;&#xf09d;</button>
           </div>
         </div>
       </div>

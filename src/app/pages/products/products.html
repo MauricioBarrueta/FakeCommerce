@@ -44,9 +44,9 @@
     
       <div class="relative flex items-center justify-between flex-wrap">
         <div class="flex items-center space-x-3">
-          <button (click)="decreaseQuantity(product)" class="w-[26px] h-[38px] px-2 py-1 mr-0 rounded bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] text-white transition duration-200 cursor-pointer rounded-r-none font-medium">-</button>
-          <input type="number" [max]="product.stock" [min]="1" [(ngModel)]="product.quantity" id="counter-input" class="w-10 h-[38px] border border-[var(--powder-blue)] bg-white text-center text-sm font-medium focus:outline-none focus:ring-0 no-spinner selection:bg-transparent border-r-0 border-l-0 cursor-default" readonly>
-          <button (click)="increaseQuantity(product)" class="w-[26px] h-[38px] px-2 py-1 rounded bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] text-white transition duration-200 cursor-pointer rounded-l-none font-medium">+</button>
+          <button (click)="decreaseQuantity(product)" class="w-[26px] h-[38px] px-2 py-1 mr-0 rounded bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] text-white transition duration-200 cursor-pointer rounded-r-none font-medium disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="product.stock === 0">-</button>
+          <input type="number" [max]="product.stock" [min]="1" [(ngModel)]="product.quantity" id="counter-input" class="w-10 h-[38px] border border-[var(--powder-blue)] bg-white text-center text-sm font-medium focus:outline-none focus:ring-0 no-spinner selection:bg-transparent border-r-0 border-l-0 cursor-default caret-transparent" [ngClass]="product.stock === 0 ? 'text-gray-400' : ''" readonly>
+          <button (click)="increaseQuantity(product)" class="w-[26px] h-[38px] px-2 py-1 rounded bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] text-white transition duration-200 cursor-pointer rounded-l-none font-medium disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="product.stock === 0">+</button>
         </div>
 
         <div class="flex flex-col items-center">
@@ -58,8 +58,8 @@
         </div>
 
         <div class="flex gap-2">
-          <button type="button" class="flex items-center py-2 px-3 text-white text-sm rounded transition cursor-pointer bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] border border-[var(--yinmn-blue)]" (click)="onAddToCart(product)" title="Agregar al carrito">&#xf217;</button>
-          <button type="button" class="flex items-center py-2 px-3 text-sm font-medium rounded transition cursor-pointer border border-[var(--yinmn-blue)] text-[var(--yinmn-blue)] bg-white hover:bg-[var(--yinmn-blue)] hover:text-white" title="Comprar" (click)="onPurchase(product)">&#xf788;</button>
+          <button type="button" class="flex items-center py-2 px-3 text-white text-sm rounded transition cursor-pointer bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] border border-[var(--yinmn-blue)] disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="product.stock === 0" (click)="onAddToCart(product)" title="Agregar al carrito">&#xf217;</button>
+          <button type="button" class="flex items-center py-2 px-3 text-sm font-medium rounded transition cursor-pointer border border-[var(--yinmn-blue)] text-[var(--yinmn-blue)] bg-white hover:bg-[var(--yinmn-blue)] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed" [disabled]="product.stock === 0" title="Comprar" (click)="onPurchase(product)">&#xf788;</button>
         </div>
 
         <div class="w-full flex items-center justify-evenly text-xs text-gray-500 capitalize mt-3">

@@ -28,7 +28,7 @@
                   <div class="flex flex-col items-center">
                     <div class="flex items-center space-x-3">
                       <button (click)="decreaseQuantity(item)" class="w-[26px] h-[38px] px-2 py-1 mr-0 rounded text-white font-semibold bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] rounded-r-none transition duration-200 cursor-pointer">-</button>
-                      <input type="number" [max]="item.stock" [min]="1" [value]="item.quantity ?? 1" id="counter-input" data-input-counter class="w-10 h-[38px] border border-[var(--powder-blue)] border-r-0 border-l-0 bg-transparent text-center text-sm font-medium focus:outline-none focus:ring-0 no-spinner">
+                      <input type="number" [max]="item.stock" [min]="1" [value]="item.quantity ?? 1" id="counter-input" data-input-counter class="w-10 h-[38px] border border-[var(--powder-blue)] border-r-0 border-l-0 bg-transparent text-center text-sm font-medium focus:outline-none focus:ring-0 no-spinner caret-transparent" readonly>
                       <button (click)="increaseQuantity(item)" class="w-[26px] h-[38px] px-2 py-1 rounded text-white font-medium bg-[var(--yinmn-blue)] hover:bg-[var(--yinmn-blue-shadow)] rounded-l-none transition duration-200 cursor-pointer">+</button>
                     </div>
                     <span class="text-xs text-gray-400 mt-3">(+{{ item.stock }} disponibles)</span>
