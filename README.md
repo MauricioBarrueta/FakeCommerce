@@ -1,3 +1,13 @@
+🇲🇽 Sitio web desarrollado con Angular y TypeScript, SCSS y principalmente Tailwind CSS, publicado con Firebase Hosting y conectado a la API DummyJSON.
+
+🇺🇸 Website developed with Angular and TypeScript, using SCSS and primarily Tailwind CSS, deployed on Firebase Hosting and connected to the DummyJSON API.
+
+🔗 https://fakecommerce-c69d8.web.app/products/
+
+
+<img width="1349" height="688" alt="fake-comm" src="https://github.com/user-attachments/assets/86608eb5-b7dd-4c2f-9161-9f2cc938ad07" />
+
+
 # FakeCommerce
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.2.0.
